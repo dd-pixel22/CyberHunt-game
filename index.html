@@ -3,74 +3,354 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CYBERHUNT // AI Cybersecurity Learning Platform</title>
-  <link rel="stylesheet" href="style.css">
+  <title>CYBERHUNT Enterprise // Cyber Security & Intelligence Console</title>
+  <style>
+    /* ==========================================================================
+       CYBERHUNT ENTERPRISE // DARK & CRIMSON PROFESSIONAL THEMING
+       ========================================================================== */
+    :root {
+      --bg-main: #090a0f;
+      --bg-sidebar: #10121a;
+      --bg-card: #171924;
+      --bg-card-hover: #1e2130;
+      --border: #26293a;
+      
+      --crimson: #e63946;
+      --crimson-hover: #c92a37;
+      --crimson-soft: rgba(230, 57, 70, 0.12);
+      
+      --text-main: #f1f3f9;
+      --text-muted: #8a90a3;
+      --text-dark: #505566;
+      
+      --green: #2ec4b6;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* TOP ENTERPRISE HEADER */
+    .app-header {
+      height: 56px;
+      background-color: var(--bg-sidebar);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .brand-name { font-weight: 700; font-size: 1rem; letter-spacing: 0.5px; }
+    .brand-badge {
+      background: var(--crimson-soft);
+      color: var(--crimson);
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(230, 57, 70, 0.3);
+    }
+
+    .user-profile { display: flex; align-items: center; gap: 12px; }
+    .agent-id { font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono); }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--crimson); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: bold;
+    }
+
+    /* THREE-PANEL LAYOUT (JENNI AI STYLE) */
+    .app-container {
+      display: grid;
+      grid-template-columns: 280px 1fr 360px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* LEFT SIDEBAR: NAVIGATION & MODULE SELECTOR */
+    .sidebar {
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      margin-top: 12px;
+    }
+
+    .nav-item {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-bottom: 4px;
+      transition: all 0.2s;
+    }
+
+    .nav-item:hover { background: var(--bg-card); color: var(--text-main); }
+    .nav-item.active { background: var(--crimson-soft); color: var(--crimson); font-weight: 600; }
+
+    .module-selector-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 250px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+    }
+
+    .module-btn {
+      padding: 8px 10px;
+      background: #0c0d14;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-align: left;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .module-btn:hover, .module-btn.active {
+      border-color: var(--crimson);
+      color: var(--text-main);
+      background: var(--bg-card);
+    }
+
+    .badge-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    .badge-pill {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; opacity: 0.3;
+    }
+    .badge-pill.unlocked { opacity: 1; border-color: var(--crimson); background: var(--crimson-soft); }
+
+    /* WORKSPACE MAIN PANEL */
+    .workspace {
+      padding: 32px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .tab-content { display: none; flex-direction: column; gap: 20px; }
+    .tab-content.active { display: flex; }
+
+    .workspace-header h2 { font-size: 1.4rem; font-weight: 600; margin-bottom: 6px; }
+    .subtitle { color: var(--text-muted); font-size: 0.9rem; }
+
+    .case-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+    .case-tab {
+      padding: 8px 16px;
+      background: #0d0e14;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .case-tab.active { background: var(--crimson-soft); border-color: var(--crimson); color: var(--crimson); }
+
+    .content-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .content-card h3 { font-size: 1rem; margin-bottom: 12px; color: var(--text-main); }
+    .content-card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
+
+    .code-block {
+      background: #0d0e14;
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--crimson);
+      margin: 12px 0;
+    }
+
+    .input-row { display: flex; gap: 10px; margin-top: 16px; }
+
+    input[type="text"], textarea {
+      width: 100%;
+      background: #0d0e14;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="text"]:focus, textarea:focus { border-color: var(--crimson); }
+    textarea { min-height: 90px; resize: vertical; }
+
+    .btn-primary {
+      background: var(--crimson);
+      color: white; border: none;
+      padding: 10px 18px; border-radius: 6px;
+      font-weight: 600; font-size: 0.85rem;
+      cursor: pointer; white-space: nowrap;
+    }
+    .btn-primary:hover { background: var(--crimson-hover); }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 10px 18px; border-radius: 6px;
+      font-size: 0.85rem; cursor: pointer; white-space: nowrap;
+    }
+    .btn-secondary:hover { background: var(--bg-card-hover); color: var(--text-main); }
+
+    .hint-container {
+      margin-top: 12px; padding: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid var(--crimson);
+      font-size: 0.85rem; color: var(--text-muted);
+    }
+
+    .hidden { display: none; }
+    .feedback-msg { margin-top: 12px; font-size: 0.85rem; font-weight: 600; }
+
+    /* QUIZ & CONVERTER COMPONENTS */
+    .quiz-options { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+    .quiz-opt {
+      padding: 12px 16px; background: #0d0e14;
+      border: 1px solid var(--border); border-radius: 6px;
+      cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
+    }
+    .quiz-opt:hover { border-color: var(--crimson); background: var(--bg-card-hover); }
+
+    /* PERSISTENT AI ASSISTANT PANEL (CHATGPT / JENNI STYLE) */
+    .ai-panel {
+      background-color: var(--bg-sidebar);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ai-header {
+      padding: 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .ai-title { font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+    .ai-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+    .ai-status { font-size: 0.75rem; color: var(--text-dark); }
+
+    .ai-chat-history {
+      flex: 1; padding: 16px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+
+    .ai-msg { padding: 12px 14px; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; max-width: 90%; }
+    .ai-msg.assistant { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-main); align-self: flex-start; }
+    .ai-msg.user { background: var(--crimson); color: white; align-self: flex-end; }
+
+    .ai-input-area { padding: 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; }
+  </style>
 </head>
 <body>
 
-  <!-- TOP APP BAR -->
+  <!-- ENTERPRISE NAVBAR -->
   <header class="app-header">
     <div class="brand">
       <span class="brand-logo">🛡️</span>
       <span class="brand-name">CYBERHUNT <span class="brand-badge">ENTERPRISE</span></span>
     </div>
     <div class="user-profile">
-      <span class="agent-id">ID: DETECTIVE_01</span>
-      <div class="avatar">D1</div>
+      <span class="agent-id">AGENT: INVESTIGATOR_X</span>
+      <div class="avatar">IX</div>
     </div>
   </header>
 
-  <!-- MAIN APP CONTAINER -->
+  <!-- APP WORKSPACE -->
   <div class="app-container">
 
-    <!-- LEFT SIDEBAR: NAV & MODULES -->
+    <!-- NAVIGATION SIDEBAR -->
     <aside class="sidebar">
-      <div class="sidebar-section">
-        <div class="section-label">LEARNING PATHS</div>
-        <button class="nav-item active" onclick="switchTab('modules')">📚 Modules & Case Studies</button>
-        <button class="nav-item" onclick="switchTab('quizzes')">📝 Diagnostic Quizzes</button>
-        <button class="nav-item" onclick="switchTab('puzzles')">🧩 Encoding / Decoding Lab</button>
-      </div>
+      <div class="section-label">MAIN NAVIGATION</div>
+      <button class="nav-item active" onclick="switchTab('modules', event)">📚 Modules & Case Studies</button>
+      <button class="nav-item" onclick="switchTab('quizzes', event)">📝 Knowledge Checks</button>
+      <button class="nav-item" onclick="switchTab('puzzles', event)">🧩 Decoder Workbench</button>
 
-      <div class="sidebar-section" style="margin-top: 20px;">
-        <div class="section-label">PROGRESS & BADGES</div>
-        <div class="badge-row" id="sidebar-badges">
-          <!-- Dynamically Generated -->
-        </div>
-      </div>
+      <div class="section-label">SELECT MODULE (1-15)</div>
+      <div class="module-selector-list" id="module-selector-list"></div>
+
+      <div class="section-label">PROGRESS BADGES</div>
+      <div class="badge-grid" id="sidebar-badges"></div>
     </aside>
 
-    <!-- CENTER MAIN WORKSPACE -->
+    <!-- CENTER CONTENT AREA -->
     <main class="workspace">
 
-      <!-- TAB 1: MODULES & CASE STUDIES -->
+      <!-- TAB 1: 15 MODULES & 3 CASE STUDIES EACH -->
       <section id="tab-modules" class="tab-content active">
         <div class="workspace-header">
-          <h2 id="module-title">Module 1: Digital Forensics & Log Analysis</h2>
-          <p class="subtitle">Investigate enterprise attack vectors, analyze logs, and extract indicators of compromise (IOCs).</p>
+          <h2 id="module-title">Module 1</h2>
+          <p class="subtitle" id="module-sub">Select a case study below to begin investigation.</p>
+        </div>
+
+        <div class="case-tabs">
+          <button class="case-tab active" onclick="selectCaseTab(0)">Case Study A</button>
+          <button class="case-tab" onclick="selectCaseTab(1)">Case Study B</button>
+          <button class="case-tab" onclick="selectCaseTab(2)">Case Study C</button>
         </div>
 
         <div class="content-card">
           <h3>📘 Pre-Learning Briefing</h3>
-          <p id="pre-learning-body">
-            Security analysts examine server request headers, timestamp variations, and HTTP response codes to isolate unauthorized network breaches. Before analyzing payload hashes, verify whether IP connections originate from internal subnets or untrusted external proxies.
-          </p>
+          <p id="pre-learning-body">Loading educational briefing...</p>
         </div>
 
         <div class="content-card">
-          <h3>🔍 Active Case Study & Interactive Lab</h3>
-          <p id="case-body">
-            <strong>Scenario:</strong> Intercepted database payload contains an encoded credential token. Decode the string below to extract the master admin key and secure the system.
-          </p>
-          <div class="code-block" id="case-payload">Q1lCRVItQURNSU4tMjAyNg==</div>
+          <h3 id="case-title-heading">🔍 Case Study Investigation</h3>
+          <p id="case-body">Loading case scenario...</p>
+          <div class="code-block" id="case-payload">PAYLOAD_DATA</div>
 
           <div class="input-row">
-            <input type="text" id="module-answer" placeholder="Enter extracted key (e.g., CYBER-ADMIN-2026)">
-            <button class="btn-primary" onclick="checkModuleAnswer()">Submit Analysis</button>
+            <input type="text" id="module-answer" placeholder="Enter extracted key or solution command...">
+            <button class="btn-primary" onclick="checkCaseAnswer()">Submit Analysis</button>
             <button class="btn-secondary" onclick="toggleHint()">💡 Request Hint</button>
           </div>
+
           <div id="hint-box" class="hint-container hidden">
-            <strong>Analyst Note:</strong> The string uses Base64 encoding. Convert standard 64-character ASCII sets back to readable plaintext.
+            <strong>Analyst Hint:</strong> <span id="hint-text">Loading hint...</span>
           </div>
           <div id="module-feedback" class="feedback-msg"></div>
         </div>
@@ -79,66 +359,287 @@
       <!-- TAB 2: DIAGNOSTIC QUIZZES -->
       <section id="tab-quizzes" class="tab-content">
         <div class="workspace-header">
-          <h2>Knowledge Check: Network Security & Threats</h2>
-          <p class="subtitle">Validate your understanding of cyber defense fundamentals.</p>
+          <h2>Enterprise Knowledge Checks</h2>
+          <p class="subtitle">Test your foundational security knowledge across key cyber domains.</p>
         </div>
 
         <div class="content-card">
           <h3 id="quiz-question">Q1: Which port does unencrypted HTTP traffic use by default?</h3>
-          <div class="quiz-options" id="quiz-options">
-            <!-- Dynamically Populated -->
-          </div>
+          <div class="quiz-options" id="quiz-options"></div>
           <div id="quiz-feedback" class="feedback-msg"></div>
         </div>
       </section>
 
-      <!-- TAB 3: ENCODING / DECODING LAB -->
+      <!-- TAB 3: CIPHER & ENCODING WORKBENCH -->
       <section id="tab-puzzles" class="tab-content">
         <div class="workspace-header">
-          <h2>Cryptographic & Encoding Workbench</h2>
-          <p class="subtitle">Test cipher transformations, Base64 strings, and hash utilities in real-time.</p>
+          <h2>Cryptographic & Decoder Workbench</h2>
+          <p class="subtitle">Convert payloads, analyze hashes, and decode strings in real-time.</p>
         </div>
 
         <div class="content-card">
-          <h3>Interactive Converter</h3>
-          <textarea id="converter-input" placeholder="Type or paste text here..."></textarea>
-          <div class="button-group">
+          <h3>Interactive Payload Decoder</h3>
+          <textarea id="converter-input" placeholder="Paste Base64, Hex, or text string here..."></textarea>
+          <div class="input-row" style="margin-bottom: 12px;">
             <button class="btn-primary" onclick="convertText('b64-encode')">Base64 Encode</button>
             <button class="btn-primary" onclick="convertText('b64-decode')">Base64 Decode</button>
             <button class="btn-secondary" onclick="convertText('hex-encode')">Hex Encode</button>
             <button class="btn-secondary" onclick="convertText('rot13')">ROT13 Cipher</button>
           </div>
-          <div class="output-label">OUTPUT RESULT</div>
+          <div class="subtitle">OUTPUT RESULT</div>
           <div class="code-block" id="converter-output">Awaiting input...</div>
         </div>
       </section>
 
     </main>
 
-    <!-- RIGHT SIDEBAR: PERSISTENT AI RESEARCH ASSISTANT (JENNI / CHATGPT STYLE) -->
+    <!-- RIGHT SIDEBAR: UNRESTRICTED AI RESEARCH COPILOT -->
     <aside class="ai-panel">
       <div class="ai-header">
         <div class="ai-title">
           <span class="ai-dot"></span>
           CYBERHUNT AI Assistant
         </div>
-        <span class="ai-status">Online</span>
+        <span class="ai-status">Ready</span>
       </div>
 
       <div class="ai-chat-history" id="ai-chat">
         <div class="ai-msg assistant">
-          Hello Detective. I am your specialized cybersecurity research copilot. Ask me any question about threat vectors, ciphers, code analysis, or security concepts.
+          Hello Agent. I am your specialized AI research copilot. Ask me any question regarding security protocols, payload analysis, code vulnerabilities, or learning hints.
         </div>
       </div>
 
       <div class="ai-input-area">
         <textarea id="ai-user-input" placeholder="Ask AI Assistant anything..." rows="2" onkeydown="handleAiKey(event)"></textarea>
-        <button class="btn-primary" onclick="sendAiMessage()">Send</button>
+        <button class="btn-primary" onclick="sendAiMessage()">Send Prompt</button>
       </div>
     </aside>
 
   </div>
 
-  <script src="script.js"></script>
+  <!-- APPLICATION LOGIC ENGINE -->
+  <script>
+    /* ==========================================================================
+       15 MODULES x 3 CASE STUDIES EACH DATA STRUCTURE
+       ========================================================================== */
+    const modulesData = Array.from({ length: 15 }, (_, mIdx) => {
+      const titles = [
+        'Digital Forensics', 'Network Intrusions', 'Phishing Vectors', 'Malware Triage',
+        'Memory Forensics', 'Log Analysis', 'Encryption Breaking', 'Ransomware Tracing',
+        'Insider Threats', 'Cloud Espionage', 'Mobile Exploits', 'IoT Security',
+        'Identity Theft', 'Darknet Analysis', 'Incident Response'
+      ];
+      const badges = ['🔍', '📡', '✉️', '🦠', '🧠', '📜', '🔐', '☣️', '👤', '☁️', '📱', '📟', '🆔', '🌐', '🛡️'];
+
+      return {
+        id: mIdx + 1,
+        title: `Module ${mIdx + 1}: ${titles[mIdx]}`,
+        badgeIcon: badges[mIdx],
+        cases: [
+          {
+            title: `Case Study ${mIdx + 1}-A: Reconnaissance & Entry Vector`,
+            preLearning: `Pre-Learning: Modern cyber defenders begin by examining entry payloads and header metadata. Understanding encoding standards like Base64 is vital for isolating unauthorized network connections.`,
+            scenario: `Scenario: Intercepted authorization token contains an encoded string. Decode the string to extract the admin key.`,
+            payload: btoa(`KEY_MOD_${mIdx + 1}_ALPHA_2026`),
+            hint: `Use Base64 decoding tools or our workbench to reveal the plaintext string.`,
+            solution: `KEY_MOD_${mIdx + 1}_ALPHA_2026`
+          },
+          {
+            title: `Case Study ${mIdx + 1}-B: Anomaly Identification`,
+            preLearning: `Pre-Learning: Port scanning logs highlight unexpected activity. Identifying standard protocol ports helps distinguish normal network traffic from unauthorized access.`,
+            scenario: `Scenario: Enter the default port used for unencrypted legacy FTP access to locate the vector.`,
+            payload: `SCAN_LOG // PORT_QUERY_LEVEL_${mIdx + 1}`,
+            hint: `Standard FTP control connections operate on Port 21.`,
+            solution: `21`
+          },
+          {
+            title: `Case Study ${mIdx + 1}-C: Threat Mitigation & Containment`,
+            preLearning: `Pre-Learning: Incident response requires terminating unauthorized processes immediately upon detection to stop data exfiltration.`,
+            scenario: `Scenario: Issue the shell command to terminate rogue Process ID (PID) 9942.`,
+            payload: `RUNNING_PROCESS // UNTRUSTED_PID_9942`,
+            hint: `Type "kill 9942" to terminate the target process.`,
+            solution: `kill 9942`
+          }
+        ]
+      };
+    });
+
+    let currentModuleIdx = 0;
+    let currentCaseIdx = 0;
+    let unlockedBadges = new Set([0]);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderModuleList();
+      renderBadges();
+      loadModuleView();
+      loadQuizQuestion();
+    });
+
+    function renderModuleList() {
+      const list = document.getElementById('module-selector-list');
+      list.innerHTML = '';
+      modulesData.forEach((m, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `module-btn ${idx === 0 ? 'active' : ''}`;
+        btn.innerText = m.title;
+        btn.onclick = () => {
+          currentModuleIdx = idx;
+          currentCaseIdx = 0;
+          document.querySelectorAll('.module-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+          loadModuleView();
+        };
+        list.appendChild(btn);
+      });
+    }
+
+    function renderBadges() {
+      const grid = document.getElementById('sidebar-badges');
+      grid.innerHTML = '';
+      modulesData.forEach((m, idx) => {
+        const pill = document.createElement('div');
+        pill.className = `badge-pill ${unlockedBadges.has(idx) ? 'unlocked' : ''}`;
+        pill.innerText = m.badgeIcon;
+        pill.title = m.title;
+        grid.appendChild(pill);
+      });
+    }
+
+    function selectCaseTab(cIdx) {
+      currentCaseIdx = cIdx;
+      document.querySelectorAll('.case-tab').forEach((tab, i) => tab.classList.toggle('active', i === cIdx));
+      loadModuleView();
+    }
+
+    function loadModuleView() {
+      const mod = modulesData[currentModuleIdx];
+      const caseData = mod.cases[currentCaseIdx];
+
+      document.getElementById('module-title').innerText = mod.title;
+      document.getElementById('pre-learning-body').innerText = caseData.preLearning;
+      document.getElementById('case-title-heading').innerText = caseData.title;
+      document.getElementById('case-body').innerText = caseData.scenario;
+      document.getElementById('case-payload').innerText = caseData.payload;
+      document.getElementById('hint-text').innerText = caseData.hint;
+      document.getElementById('module-feedback').innerText = '';
+      document.getElementById('module-answer').value = '';
+      document.getElementById('hint-box').classList.add('hidden');
+    }
+
+    function checkCaseAnswer() {
+      const val = document.getElementById('module-answer').value.trim();
+      const caseData = modulesData[currentModuleIdx].cases[currentCaseIdx];
+      const feedback = document.getElementById('module-feedback');
+
+      if (val.toLowerCase() === caseData.solution.toLowerCase()) {
+        feedback.style.color = 'var(--green)';
+        feedback.innerText = '✓ Correct! Threat resolved and case analysis verified.';
+        unlockedBadges.add(currentModuleIdx);
+        renderBadges();
+      } else {
+        feedback.style.color = 'var(--crimson)';
+        feedback.innerText = '✗ Incorrect solution. Request a hint or test in the decoder workbench.';
+      }
+    }
+
+    function toggleHint() {
+      document.getElementById('hint-box').classList.toggle('hidden');
+    }
+
+    function switchTab(tabId, evt) {
+      document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+      evt.currentTarget.classList.add('active');
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
+
+    // QUIZ SYSTEM
+    const quizData = [
+      { q: "Which port does unencrypted HTTP traffic use by default?", opts: ["Port 22", "Port 80", "Port 443", "Port 8080"], correct: 1 },
+      { q: "Which attack vector involves tricking users via fake emails?", opts: ["DDoS", "Phishing", "SQL Injection", "Man-in-the-Middle"], correct: 1 }
+    ];
+
+    function loadQuizQuestion() {
+      const q = quizData[0];
+      document.getElementById('quiz-question').innerText = q.q;
+      const container = document.getElementById('quiz-options');
+      container.innerHTML = '';
+
+      q.opts.forEach((opt, idx) => {
+        const btn = document.createElement('div');
+        btn.className = 'quiz-opt';
+        btn.innerText = opt;
+        btn.onclick = () => {
+          const feedback = document.getElementById('quiz-feedback');
+          if (idx === q.correct) {
+            feedback.style.color = 'var(--green)';
+            feedback.innerText = '✓ Correct answer!';
+          } else {
+            feedback.style.color = 'var(--crimson)';
+            feedback.innerText = '✗ Incorrect. Try again.';
+          }
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    // CONVERTER TOOLS
+    function convertText(mode) {
+      const input = document.getElementById('converter-input').value;
+      const output = document.getElementById('converter-output');
+
+      try {
+        if (mode === 'b64-encode') output.innerText = btoa(input);
+        else if (mode === 'b64-decode') output.innerText = atob(input);
+        else if (mode === 'hex-encode') output.innerText = Array.from(input).map(c => c.charCodeAt(0).toString(16)).join(' ');
+        else if (mode === 'rot13') output.innerText = input.replace(/[a-zA-Z]/g, c => String.fromCharCode((c <= 'Z' ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26));
+      } catch (err) {
+        output.innerText = "Error converting input string.";
+      }
+    }
+
+    // AI CHATBOT ENGINE
+    function sendAiMessage() {
+      const input = document.getElementById('ai-user-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const chat = document.getElementById('ai-chat');
+
+      const userMsg = document.createElement('div');
+      userMsg.className = 'ai-msg user';
+      userMsg.innerText = text;
+      chat.appendChild(userMsg);
+
+      input.value = '';
+      chat.scrollTop = chat.scrollHeight;
+
+      setTimeout(() => {
+        const assistantMsg = document.createElement('div');
+        assistantMsg.className = 'ai-msg assistant';
+        assistantMsg.innerText = generateAiResponse(text);
+        chat.appendChild(assistantMsg);
+        chat.scrollTop = chat.scrollHeight;
+      }, 500);
+    }
+
+    function handleAiKey(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendAiMessage();
+      }
+    }
+
+    function generateAiResponse(prompt) {
+      const p = prompt.toLowerCase();
+      if (p.includes('base64') || p.includes('decode')) {
+        return "Base64 encodes binary data into ASCII strings. Decode it using the workbench tab or standard 'atob()' commands.";
+      } else if (p.includes('port')) {
+        return "Key ports: 21 (FTP), 22 (SSH), 80 (HTTP), 443 (HTTPS), 53 (DNS), 3389 (RDP).";
+      } else {
+        return `Regarding "${prompt}": Security best practices require isolating threat vectors, auditing access logs, and verifying checksum signatures.`;
+      }
+    }
+  </script>
 </body>
 </html>
