@@ -3,88 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CYBERHUNT // Digital Forensics SOC</title>
+  <title>CyberHunt // Security Operations Academy</title>
   
-  <!-- 1. Three.js 3D WebGL Library -->
+  <!-- Three.js 3D WebGL Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   
-  <!-- 2. Link your styles.css File Here -->
+  <!-- Link Stylesheet -->
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-  <div class="scanline"></div>
   <div id="canvas-container"></div>
 
-  <!-- 1. CINEMATIC INTRO SCREEN -->
+  <!-- 1. INTRO SCREEN -->
   <div id="screen-intro" class="screen active">
-    <div class="typewriter-title">CYBERHUNT</div>
-    <div id="typewriter-body" class="typewriter-text"></div>
-    <button class="neon-btn" onclick="initSOC()">[ INITIALIZE SOC SYSTEM ]</button>
+    <div class="intro-card">
+      <div class="intro-title">CyberHunt</div>
+      <div id="typewriter-body" class="typewriter-text"></div>
+      <button class="btn-primary" onclick="initSOC()">Enter SOC Academy</button>
+    </div>
   </div>
 
   <!-- HUD HEADER -->
   <div id="hud" class="hud-header" style="display:none;">
-    <div class="brand">CYBERHUNT // FORENSICS</div>
+    <div class="brand">
+      <span>CyberHunt</span> / SOC Academy
+    </div>
     <div class="stats-bar">
-      <div>SCORE: <span id="score" style="color:var(--red-primary);">0</span> PTS</div>
-      <div>BADGES: <span id="badges-count" style="color:var(--amber-warning);">0/3</span></div>
-      <div>AGENT: <span style="color:#fff;">CYBER-DETECTIVE</span></div>
+      <div class="stat-item">Score: <span id="score" style="color:var(--accent-blue);">0</span> PTS</div>
+      <div class="stat-item">Badges: <span id="badges-count" style="color:var(--accent-amber);">0/3</span></div>
+      <div class="stat-item">Role: <span style="color:#fff;">Analyst</span></div>
     </div>
   </div>
 
   <!-- 2. DASHBOARD SCREEN -->
   <div id="screen-dashboard" class="screen">
     <div class="dashboard-header-text">
-      <h2>ACTIVE CASE FILES</h2>
-      <p>Select an investigation file to begin digital forensic operations.</p>
+      <h2>Forensic Training Modules</h2>
+      <p>Select an investigation module to learn forensic techniques, test tools, and complete case assessments.</p>
     </div>
     <div class="dashboard-grid">
       <!-- Case 1 -->
       <div class="case-card">
         <div>
-          <div class="case-title">CASE #01: PHANTOM WIRE</div>
-          <p style="font-size:0.85rem; color:var(--text-muted);">Rogue Spear-Phishing & OSINT Reconnaissance Investigation.</p>
-          <div class="badge-icon">🕵️‍♂️</div>
+          <div class="case-header">
+            <div class="case-title">Module 01: Phantom Wire</div>
+            <div class="badge-icon">🕵️‍♂️</div>
+          </div>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 20px;">
+            Learn Base64 encoding, ROT13 ciphers, IP log filtering, and Caesar shift logic.
+          </p>
         </div>
         <div>
-          <p style="font-size:0.8rem; color:#888; margin-bottom:10px;">LEVELS: 5 | QUESTIONS: 3</p>
-          <button class="neon-btn" style="width:100%;" onclick="startCase(0)">OPEN CASE FILE</button>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">5 Lessons | 3 Questions</p>
+          <button class="btn-primary" style="width:100%;" onclick="startCase(0)">Start Module</button>
         </div>
       </div>
       <!-- Case 2 -->
       <div class="case-card">
         <div>
-          <div class="case-title">CASE #02: DARK PAYLOAD</div>
-          <p style="font-size:0.85rem; color:var(--text-muted);">Drone Flight Controller Zero-Day Payload & Memory Forensics.</p>
-          <div class="badge-icon">🛸</div>
+          <div class="case-header">
+            <div class="case-title">Module 02: Dark Payload</div>
+            <div class="badge-icon">🛸</div>
+          </div>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 20px;">
+            Examine flight telemetry, process PIDs in memory dumps, and convert Hex data.
+          </p>
         </div>
         <div>
-          <p style="font-size:0.8rem; color:#888; margin-bottom:10px;">LEVELS: 5 | QUESTIONS: 3</p>
-          <button class="neon-btn" style="width:100%;" onclick="startCase(1)">OPEN CASE FILE</button>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">5 Lessons | 3 Questions</p>
+          <button class="btn-primary" style="width:100%;" onclick="startCase(1)">Start Module</button>
         </div>
       </div>
       <!-- Case 3 -->
       <div class="case-card">
         <div>
-          <div class="case-title">CASE #03: SYNDICATE HEIST</div>
-          <p style="font-size:0.85rem; color:var(--text-muted);">Rogue Insider Exfiltration & Cold Vault Log Analysis.</p>
-          <div class="badge-icon">💎</div>
+          <div class="case-header">
+            <div class="case-title">Module 03: Syndicate Heist</div>
+            <div class="badge-icon">💎</div>
+          </div>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 20px;">
+            Analyze off-hours auth logs, decrypt exfiltrated keys, and identify backdoor ports.
+          </p>
         </div>
         <div>
-          <p style="font-size:0.8rem; color:#888; margin-bottom:10px;">LEVELS: 5 | QUESTIONS: 3</p>
-          <button class="neon-btn" style="width:100%;" onclick="startCase(2)">OPEN CASE FILE</button>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">5 Lessons | 3 Questions</p>
+          <button class="btn-primary" style="width:100%;" onclick="startCase(2)">Start Module</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 3. INVESTIGATION WORKSPACE -->
+  <!-- 3. LEARNING & WORKSPACE SCREEN -->
   <div id="screen-case" class="screen">
     <div class="workspace">
-      <!-- Left Panel: Brief & Hints -->
+      <!-- Left Panel: Lesson & Hints -->
       <div class="panel">
-        <div class="panel-title" id="case-heading">CASE BRIEFING</div>
+        <div class="panel-title" id="case-heading">Module Briefing</div>
         <div class="level-stepper">
           <div class="step step-1"></div>
           <div class="step step-2"></div>
@@ -92,42 +107,56 @@
           <div class="step step-4"></div>
           <div class="step step-5"></div>
         </div>
-        <p id="level-title" style="color:var(--text-main); font-weight:bold; margin-bottom:8px;"></p>
-        <p id="level-desc" style="font-size:0.85rem; color:var(--text-muted); line-height:1.4; margin-bottom:15px;"></p>
         
-        <div class="panel-title" style="margin-top:auto;">PROGRESSIVE HINTS</div>
-        <button class="neon-btn" style="font-size:0.8rem; padding:8px;" onclick="revealHint()">REVEAL HINT (-50 PTS)</button>
-        <div id="hint-display" class="clue-box" style="margin-top:8px; display:none; color:var(--amber-warning);"></div>
+        <!-- Interactive Lesson Card -->
+        <div class="info-box">
+          <div id="lesson-title" style="color: var(--accent-indigo); font-weight: bold; margin-bottom: 6px; font-size: 0.85rem;"></div>
+          <div id="lesson-text" style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;"></div>
+        </div>
+
+        <div>
+          <p id="level-title" style="color:var(--text-main); font-weight:700; margin-bottom:6px; font-size: 0.95rem;"></p>
+          <p id="level-desc" style="font-size:0.85rem; color:var(--text-muted); line-height:1.5;"></p>
+        </div>
+        
+        <div style="margin-top:auto;">
+          <div class="panel-title" style="margin-bottom: 12px;">Hint System</div>
+          <button class="btn-secondary" style="width: 100%;" onclick="revealHint()">Reveal Hint (-50 PTS)</button>
+          <div id="hint-display" class="info-box evidence-box" style="margin-top:10px; display:none; color:var(--accent-amber); font-size: 0.82rem;"></div>
+        </div>
       </div>
 
-      <!-- Center Panel: Hands-on Cyber Terminal -->
+      <!-- Center Panel: CLI Practice Terminal -->
       <div class="panel">
-        <div class="panel-title">HANDS-ON FORENSIC CONSOLE</div>
-        <div class="clue-box" id="evidence-box">INTERCEPTED EVIDENCE: <br><span id="raw-evidence" style="color:#fff; font-weight:bold;"></span></div>
+        <div class="panel-title">Forensic Console</div>
+        <div class="info-box evidence-box" id="evidence-box">
+          <span style="font-size: 0.75rem; color: var(--accent-amber); font-weight: 700; text-transform: uppercase;">Intercepted Evidence</span>
+          <div id="raw-evidence" style="color:#fff; font-weight:600; margin-top: 4px; font-family: var(--font-mono); font-size: 0.9rem;"></div>
+        </div>
         
         <div class="terminal-output" id="term-out">
-          <div>[SYSTEM READY] Terminal initialized. Commands available: decode, rot13, grep, help</div>
+          <div>[SYSTEM READY] Console initialized. Commands: decode &lt;text&gt;, rot13 &lt;text&gt;, grep &lt;pattern&gt;</div>
         </div>
         <div class="terminal-input-group">
-          <input type="text" id="term-input" placeholder="Enter CLI command (e.g. decode <text>)" onkeypress="handleTermKey(event)">
-          <button class="neon-btn" style="padding:5px 15px;" onclick="runCommand()">EXEC</button>
+          <input type="text" id="term-input" placeholder="e.g. decode Q3liZXJIdW50..." onkeypress="handleTermKey(event)">
+          <button class="btn-primary" onclick="runCommand()">Run</button>
         </div>
 
-        <div style="margin-top: 15px; border-top: 1px solid var(--red-dim); padding-top: 10px;">
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Target Objective Answer:</p>
-          <div class="terminal-input-group" style="margin-top:5px;">
-            <input type="text" id="target-input" placeholder="Submit solution to unlock Level...">
-            <button class="neon-btn" style="padding:5px 15px;" onclick="submitLevelAnswer()">SUBMIT</button>
+        <div style="margin-top: auto; border-top: 1px solid var(--border-color); padding-top: 16px;">
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">Target Solution Submission:</p>
+          <div class="terminal-input-group">
+            <input type="text" id="target-input" placeholder="Submit decoded string or answer...">
+            <button class="btn-primary" onclick="submitLevelAnswer()">Submit</button>
           </div>
         </div>
       </div>
 
-      <!-- Right Panel: Case Questions -->
+      <!-- Right Panel: Quiz Questions Platform -->
       <div class="panel">
-        <div class="panel-title">CASE INVESTIGATION QUESTIONS</div>
-        <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">Answer all 3 case questions as you gather clues across the 5 levels.</p>
-        <div id="questions-container"></div>
-        <button class="neon-btn" style="margin-top:auto; width:100%;" onclick="exitToDashboard()">RETURN TO DASHBOARD</button>
+        <div class="panel-title">Module Assessment</div>
+        <p style="font-size:0.82rem; color:var(--text-muted);">Answer the following questions to demonstrate competency in this module.</p>
+        <div id="questions-container" style="display: flex; flex-direction: column; gap: 12px; overflow-y: auto;"></div>
+        <button class="btn-secondary" style="margin-top:auto; width:100%;" onclick="exitToDashboard()">Return to Dashboard</button>
       </div>
     </div>
   </div>
@@ -135,15 +164,15 @@
   <!-- REWARD MODAL -->
   <div id="modal-badge" class="modal">
     <div class="modal-content">
-      <h1 style="color:var(--red-primary); margin-bottom:10px;">CASE SOLVED!</h1>
-      <div id="badge-graphic" style="font-size:4rem; margin:15px 0;">🏆</div>
-      <h3 id="badge-name" style="color:#fff; margin-bottom:10px;">MASTER DETECTIVE BADGE</h3>
-      <p id="badge-desc" style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;"></p>
-      <button class="neon-btn" onclick="closeModal()">CLAIM BADGE & DASHBOARD</button>
+      <h2 style="color:#ffffff; margin-bottom:8px;">Module Completed</h2>
+      <div id="badge-graphic" style="font-size:3.5rem; margin:16px 0;">🏆</div>
+      <h3 id="badge-name" style="color:var(--accent-blue); margin-bottom:12px; font-size: 1.1rem;">Master Badge</h3>
+      <p id="badge-desc" style="color:var(--text-muted); font-size:0.88rem; margin-bottom:24px; line-height: 1.5;"></p>
+      <button class="btn-primary" style="width:100%;" onclick="closeModal()">Claim Badge & Continue</button>
     </div>
   </div>
 
-  <!-- 3. Link your script.js File Here Right Before </body> -->
+  <!-- Link JavaScript -->
   <script src="script.js"></script>
 </body>
 </html>
