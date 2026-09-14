@@ -1,0 +1,469 @@
+/* ==========================================================================
+   CYBERHUNT // DIGITAL FORENSICS SOC - HIGH-CINEMATIC STYLESHEET
+   Palette: Pitch Black (#050203) & Neon Red (#FF003C)
+   ========================================================================== */
+
+/* --- ROOT VARIABLES & THEME DEFINITION --- */
+:root {
+  --bg-dark: #050203;
+  --bg-surface: #0a0305;
+  --panel-bg: rgba(15, 3, 6, 0.92);
+  --panel-bg-solid: #0d0306;
+  --red-primary: #ff003c;
+  --red-glow: #ff003c;
+  --red-dim: #70001a;
+  --red-border: rgba(255, 0, 60, 0.4);
+  --text-main: #ffffff;
+  --text-muted: #ff859c;
+  --amber-warning: #ffaa00;
+  --green-success: #00ff66;
+  --cyan-accent: #00f0ff;
+  --font-mono: 'Courier New', Courier, monospace;
+}
+
+/* --- BASE RESET & LAYOUT --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-mono);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  overflow: hidden;
+  position: relative;
+}
+
+/* --- CANVAS & RETRO CRT SCANLINE OVERLAY --- */
+#canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    rgba(18, 0, 5, 0) 50%, 
+    rgba(0, 0, 0, 0.65) 50%
+  ), 
+  linear-gradient(
+    90deg, 
+    rgba(255, 0, 60, 0.03), 
+    rgba(0, 0, 0, 0.02)
+  );
+  background-size: 100% 4px, 6px 100%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* --- SCREEN MANAGEMENT --- */
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  display: none;
+  flex-direction: column;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.screen.active {
+  display: flex;
+  opacity: 1;
+}
+
+/* --- BUTTONS & NEON INTERACTIVE ELEMENTS --- */
+.neon-btn {
+  background: transparent;
+  border: 2px solid var(--red-primary);
+  color: var(--text-main);
+  padding: 12px 28px;
+  font-size: 1rem;
+  font-weight: bold;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 0 15px var(--red-dim);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  margin: 8px 0;
+  position: relative;
+  overflow: hidden;
+  outline: none;
+}
+
+.neon-btn:hover {
+  background: var(--red-primary);
+  color: #000;
+  box-shadow: 0 0 30px var(--red-primary);
+  transform: translateY(-2px) scale(1.02);
+}
+
+.neon-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.neon-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: 0.5s;
+}
+
+.neon-btn:hover::before {
+  left: 100%;
+}
+
+/* --- 1. CINEMATIC INTRO SCREEN --- */
+#screen-intro {
+  background: rgba(5, 2, 3, 0.88);
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 30px;
+}
+
+.typewriter-title {
+  font-size: 4rem;
+  color: var(--red-primary);
+  text-shadow: 0 0 25px var(--red-primary), 0 0 50px var(--red-dim);
+  font-weight: bold;
+  letter-spacing: 8px;
+  margin-bottom: 25px;
+  animation: pulseTitle 2s infinite alternate;
+}
+
+.typewriter-text {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  max-width: 750px;
+  line-height: 1.7;
+  min-height: 140px;
+  margin-bottom: 35px;
+  text-shadow: 0 0 10px rgba(255, 0, 60, 0.4);
+}
+
+@keyframes pulseTitle {
+  0% { text-shadow: 0 0 15px var(--red-primary); }
+  100% { text-shadow: 0 0 35px var(--red-primary), 0 0 60px var(--red-primary); }
+}
+
+/* --- HUD HEADER BAR --- */
+.hud-header {
+  width: 100%;
+  height: 65px;
+  background: rgba(10, 2, 4, 0.95);
+  border-bottom: 2px solid var(--red-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+  z-index: 20;
+  box-shadow: 0 0 20px var(--red-dim);
+}
+
+.brand {
+  font-size: 1.6rem;
+  color: var(--red-primary);
+  text-shadow: 0 0 12px var(--red-primary);
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+
+.stats-bar {
+  display: flex;
+  gap: 25px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.stats-bar span {
+  font-weight: bold;
+}
+
+/* --- 2. MAIN DASHBOARD --- */
+#screen-dashboard {
+  padding-top: 10px;
+}
+
+.dashboard-header-text {
+  padding: 20px 35px 0 35px;
+}
+
+.dashboard-header-text h2 {
+  color: var(--red-primary);
+  text-shadow: 0 0 12px var(--red-primary);
+  font-size: 1.8rem;
+  letter-spacing: 2px;
+}
+
+.dashboard-header-text p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-top: 5px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  padding: 30px 35px;
+  height: calc(100% - 100px);
+  z-index: 10;
+}
+
+.case-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--red-border);
+  padding: 25px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 0 20px rgba(255, 0, 60, 0.1);
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  position: relative;
+  backdrop-filter: blur(5px);
+}
+
+.case-card:hover {
+  border-color: var(--red-primary);
+  box-shadow: 0 0 30px rgba(255, 0, 60, 0.4);
+  transform: translateY(-8px);
+}
+
+.case-title {
+  font-size: 1.35rem;
+  color: var(--red-primary);
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--red-dim);
+  padding-bottom: 8px;
+  letter-spacing: 1px;
+}
+
+.badge-icon {
+  font-size: 3.5rem;
+  text-align: center;
+  margin: 20px 0;
+  filter: drop-shadow(0 0 15px var(--red-primary));
+}
+
+/* --- 3. INVESTIGATION WORKSPACE --- */
+.workspace {
+  display: grid;
+  grid-template-columns: 320px 1fr 380px;
+  gap: 18px;
+  padding: 18px;
+  height: calc(100% - 65px);
+}
+
+.panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--red-border);
+  padding: 20px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+.panel-title {
+  color: var(--red-primary);
+  font-size: 1.05rem;
+  border-bottom: 1px solid var(--red-dim);
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+/* Stepper Progress Bar */
+.level-stepper {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.step {
+  width: 18%;
+  height: 8px;
+  background: var(--red-dim);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.step.active {
+  background: var(--red-primary);
+  box-shadow: 0 0 12px var(--red-primary);
+}
+
+/* Evidence & Clue Container */
+.clue-box {
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px dashed var(--red-primary);
+  padding: 14px;
+  margin-bottom: 15px;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  border-radius: 3px;
+  line-height: 1.5;
+}
+
+/* Terminal Console UI */
+.terminal-output {
+  background: #000000;
+  border: 1px solid var(--red-border);
+  height: 200px;
+  padding: 12px;
+  color: var(--green-success);
+  font-size: 0.9rem;
+  overflow-y: auto;
+  margin-bottom: 12px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
+}
+
+.terminal-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.terminal-input-group input {
+  flex: 1;
+  background: #000000;
+  border: 1px solid var(--red-border);
+  color: var(--text-main);
+  padding: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  outline: none;
+  border-radius: 2px;
+  transition: border-color 0.2s;
+}
+
+.terminal-input-group input:focus {
+  border-color: var(--red-primary);
+  box-shadow: 0 0 8px var(--red-dim);
+}
+
+/* Questions & Quiz UI */
+.quiz-card {
+  background: rgba(20, 2, 6, 0.85);
+  border: 1px solid var(--red-border);
+  padding: 14px;
+  margin-bottom: 14px;
+  border-radius: 3px;
+}
+
+.quiz-q {
+  color: var(--text-main);
+  font-size: 0.92rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.quiz-option {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--red-border);
+  color: var(--text-muted);
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-family: var(--font-mono);
+  transition: all 0.2s;
+  border-radius: 2px;
+}
+
+.quiz-option:hover {
+  border-color: var(--red-primary);
+  color: #fff;
+  background: rgba(255, 0, 60, 0.15);
+}
+
+.quiz-option.correct {
+  background: rgba(0, 255, 102, 0.2) !important;
+  border-color: var(--green-success) !important;
+  color: var(--green-success) !important;
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.3);
+}
+
+/* --- REWARD & BADGE MODAL --- */
+.modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 100;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(10px);
+}
+
+.modal-content {
+  background: var(--panel-bg-solid);
+  border: 2px solid var(--red-primary);
+  padding: 40px;
+  text-align: center;
+  max-width: 520px;
+  box-shadow: 0 0 50px var(--red-primary);
+  border-radius: 4px;
+  animation: modalScale 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalScale {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* --- CUSTOM SCROLLBARS --- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--red-dim);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--red-primary);
+  box-shadow: 0 0 10px var(--red-primary);
+}
