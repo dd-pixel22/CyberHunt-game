@@ -3,552 +3,142 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CYBERHUNT // Forensics & Threat Investigation Console</title>
-  <style>
-    :root {
-      --bg: #030306;
-      --panel: #0a0a12;
-      --panel-border: rgba(255, 0, 60, 0.3);
-      --red: #ff003c;
-      --red-glow: rgba(255, 0, 60, 0.6);
-      --cyan: #00f0ff;
-      --text: #d0d0e0;
-      --text-dim: #707085;
-    }
-
-    * {
-      box-sizing: border-box;
-      user-select: none;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      overflow-x: hidden;
-      min-height: 100vh;
-      background-image: 
-        radial-gradient(circle at 50% 50%, rgba(255,0,60,0.05) 0%, transparent 70%),
-        linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 100% 100%, 30px 30px, 30px 30px;
-    }
-
-    /* TYPOGRAPHY & GLOWS */
-    .neon-text {
-      color: var(--red);
-      text-shadow: 0 0 10px var(--red-glow), 0 0 20px var(--red-glow);
-      font-family: 'Courier New', Courier, monospace;
-      font-weight: bold;
-    }
-
-    /* VIEW SCREENS MANAGER */
-    .screen {
-      display: none;
-      min-height: 100vh;
-      width: 100vw;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: absolute;
-      top: 0;
-      left: 0;
-      padding: 20px;
-    }
-
-    .screen.active {
-      display: flex;
-    }
-
-    /* 1. CINEMATIC INTRO SCREEN */
-    #intro-screen {
-      text-align: center;
-      background: radial-gradient(circle, #0f0206 0%, #030306 100%);
-    }
-
-    .intro-title {
-      font-size: 4rem;
-      letter-spacing: 12px;
-      margin-bottom: 10px;
-      animation: pulse 2s infinite alternate;
-    }
-
-    .intro-sub {
-      color: var(--cyan);
-      font-family: 'Courier New', Courier, monospace;
-      letter-spacing: 6px;
-      font-size: 0.9rem;
-      margin-bottom: 40px;
-      text-shadow: 0 0 8px rgba(0,240,255,0.5);
-    }
-
-    .vfx-btn {
-      background: transparent;
-      color: var(--red);
-      border: 2px solid var(--red);
-      padding: 15px 40px;
-      font-size: 1.1rem;
-      font-family: 'Courier New', Courier, monospace;
-      font-weight: bold;
-      letter-spacing: 3px;
-      cursor: pointer;
-      box-shadow: 0 0 15px var(--panel-border);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .vfx-btn:hover {
-      background: var(--red);
-      color: #fff;
-      box-shadow: 0 0 30px var(--red);
-    }
-
-    /* 2. LOGIN PORTAL */
-    .login-box {
-      background: var(--panel);
-      border: 1px solid var(--panel-border);
-      box-shadow: 0 0 30px rgba(255, 0, 60, 0.15);
-      padding: 40px;
-      width: 100%;
-      max-width: 400px;
-      border-radius: 4px;
-      position: relative;
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-      text-align: left;
-    }
-
-    .input-group label {
-      display: block;
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      margin-bottom: 8px;
-      font-family: monospace;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 12px;
-      background: #05050a;
-      border: 1px solid #222233;
-      color: var(--cyan);
-      font-family: monospace;
-      border-radius: 4px;
-      outline: none;
-    }
-
-    .input-group input:focus {
-      border-color: var(--red);
-      box-shadow: 0 0 8px var(--panel-border);
-    }
-
-    /* 3. MAIN DASHBOARD */
-    #dashboard-screen {
-      justify-content: flex-start;
-      padding-top: 80px;
-    }
-
-    .header-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 60px;
-      background: rgba(10, 10, 18, 0.9);
-      border-bottom: 1px solid var(--panel-border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 30px;
-      z-index: 100;
-      backdrop-filter: blur(5px);
-    }
-
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 280px 1fr 300px;
-      gap: 20px;
-      width: 100%;
-      max-width: 1400px;
-    }
-
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--panel-border);
-      border-radius: 6px;
-      padding: 20px;
-    }
-
-    /* LEVEL MAP */
-    .level-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-height: 70vh;
-      overflow-y: auto;
-    }
-
-    .level-item {
-      padding: 12px;
-      background: #05050a;
-      border: 1px solid #1a1a2e;
-      border-left: 3px solid #333;
-      cursor: pointer;
-      font-family: monospace;
-      font-size: 0.85rem;
-      transition: all 0.2s;
-    }
-
-    .level-item:hover, .level-item.active {
-      border-left-color: var(--red);
-      background: #10050a;
-    }
-
-    /* CASE STUDY VIEWER */
-    .case-selector {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 10px;
-      background: #05050a;
-      border: 1px solid #222;
-      color: var(--text-dim);
-      cursor: pointer;
-      font-family: monospace;
-    }
-
-    .tab-btn.active {
-      border-color: var(--cyan);
-      color: var(--cyan);
-      background: #02121a;
-    }
-
-    .brief-box {
-      background: #020206;
-      border: 1px dashed #222;
-      padding: 15px;
-      margin-bottom: 15px;
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-
-    /* HANDS-ON TERMINAL */
-    .terminal {
-      background: #000;
-      border: 1px solid #1a1a2e;
-      border-radius: 4px;
-      padding: 15px;
-      font-family: 'Courier New', Courier, monospace;
-      min-height: 180px;
-    }
-
-    .terminal-output {
-      color: var(--cyan);
-      font-size: 0.85rem;
-      margin-bottom: 10px;
-      max-height: 120px;
-      overflow-y: auto;
-    }
-
-    .terminal-input-row {
-      display: flex;
-      gap: 10px;
-    }
-
-    .terminal-input-row input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid var(--red);
-      color: #fff;
-      font-family: monospace;
-      outline: none;
-    }
-
-    /* SLIDE-OUT CLUE DRAWER */
-    .clue-drawer {
-      position: fixed;
-      right: -350px;
-      top: 60px;
-      bottom: 0;
-      width: 320px;
-      background: #070710;
-      border-left: 2px solid var(--red);
-      padding: 20px;
-      transition: right 0.3s ease;
-      z-index: 90;
-      box-shadow: -10px 0 30px rgba(0,0,0,0.8);
-    }
-
-    .clue-drawer.open {
-      right: 0;
-    }
-
-    .badge-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .badge-icon {
-      aspect-ratio: 1;
-      background: #05050a;
-      border: 1px solid #222;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      border-radius: 4px;
-      opacity: 0.3;
-    }
-
-    .badge-icon.unlocked {
-      opacity: 1;
-      border-color: var(--red);
-      box-shadow: 0 0 10px var(--red-glow);
-    }
-
-    @keyframes pulse {
-      0% { text-shadow: 0 0 10px var(--red-glow); }
-      100% { text-shadow: 0 0 25px var(--red), 0 0 40px var(--red); }
-    }
-  </style>
+  <title>CYBERHUNT // AI Cybersecurity Learning Platform</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- HEADER BAR -->
-  <div class="header-bar">
-    <div class="neon-text" style="font-size: 1.2rem;">CYBERHUNT // FORENSICS</div>
-    <div style="display: flex; gap: 20px; align-items: center;">
-      <span id="user-display" style="font-family: monospace; font-size: 0.85rem; color: var(--cyan);">AGENT: UNKNOWN</span>
-      <button class="vfx-btn" style="padding: 5px 15px; font-size: 0.8rem;" onclick="toggleClues()">SIDE PANEL [HINTS]</button>
+  <!-- TOP APP BAR -->
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-logo">🛡️</span>
+      <span class="brand-name">CYBERHUNT <span class="brand-badge">ENTERPRISE</span></span>
     </div>
-  </div>
-
-  <!-- 1. CINEMATIC INTRO SCREEN -->
-  <div id="intro-screen" class="screen active">
-    <div class="neon-text intro-title">CYBERHUNT</div>
-    <div class="intro-sub">enter // investigate // defend</div>
-    <button class="vfx-btn" onclick="showScreen('login-screen')">INITIALIZE SYSTEM</button>
-  </div>
-
-  <!-- 2. LOGIN AUTHENTICATION PORTAL -->
-  <div id="login-screen" class="screen">
-    <div class="login-box">
-      <div class="neon-text" style="text-align: center; margin-bottom: 25px; font-size: 1.3rem;">AGENT AUTHENTICATION</div>
-      <form onsubmit="handleLogin(event)">
-        <div class="input-group">
-          <label>DETECTIVE USERNAME</label>
-          <input type="text" id="username" required placeholder="e.g. Agent_Zero">
-        </div>
-        <div class="input-group">
-          <label>SECURITY PASSCODE</label>
-          <input type="password" id="password" required placeholder="••••••••">
-        </div>
-        <button type="submit" class="vfx-btn" style="width: 100%; margin-top: 10px;">ACCESS CONSOLE</button>
-      </form>
+    <div class="user-profile">
+      <span class="agent-id">ID: DETECTIVE_01</span>
+      <div class="avatar">D1</div>
     </div>
-  </div>
+  </header>
 
-  <!-- 3. DASHBOARD (15 LEVELS / 3 CASE STUDIES EACH) -->
-  <div id="dashboard-screen" class="screen">
-    <div class="dashboard-grid">
-      
-      <!-- LEVEL MAP -->
-      <div class="card">
-        <div class="neon-text" style="margin-bottom: 15px; font-size: 0.9rem;">INVESTIGATION LEVELS</div>
-        <div class="level-list" id="level-list"></div>
+  <!-- MAIN APP CONTAINER -->
+  <div class="app-container">
+
+    <!-- LEFT SIDEBAR: NAV & MODULES -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="section-label">LEARNING PATHS</div>
+        <button class="nav-item active" onclick="switchTab('modules')">📚 Modules & Case Studies</button>
+        <button class="nav-item" onclick="switchTab('quizzes')">📝 Diagnostic Quizzes</button>
+        <button class="nav-item" onclick="switchTab('puzzles')">🧩 Encoding / Decoding Lab</button>
       </div>
 
-      <!-- ACTIVE CASE WORKSPACE -->
-      <div class="card">
-        <div class="case-selector">
-          <button class="tab-btn active" onclick="selectCase(0)">CASE STUDY A</button>
-          <button class="tab-btn" onclick="selectCase(1)">CASE STUDY B</button>
-          <button class="tab-btn" onclick="selectCase(2)">CASE STUDY C</button>
+      <div class="sidebar-section" style="margin-top: 20px;">
+        <div class="section-label">PROGRESS & BADGES</div>
+        <div class="badge-row" id="sidebar-badges">
+          <!-- Dynamically Generated -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER MAIN WORKSPACE -->
+    <main class="workspace">
+
+      <!-- TAB 1: MODULES & CASE STUDIES -->
+      <section id="tab-modules" class="tab-content active">
+        <div class="workspace-header">
+          <h2 id="module-title">Module 1: Digital Forensics & Log Analysis</h2>
+          <p class="subtitle">Investigate enterprise attack vectors, analyze logs, and extract indicators of compromise (IOCs).</p>
         </div>
 
-        <div id="case-title" class="neon-text" style="font-size: 1.1rem; margin-bottom: 10px;"></div>
-        
-        <!-- PRE-LEARNING BRIEF -->
-        <div class="brief-box">
-          <div style="color: var(--cyan); font-family: monospace; font-size: 0.75rem; margin-bottom: 5px;">PRE-LEARNING BRIEFING:</div>
-          <div id="pre-learning-text"></div>
+        <div class="content-card">
+          <h3>📘 Pre-Learning Briefing</h3>
+          <p id="pre-learning-body">
+            Security analysts examine server request headers, timestamp variations, and HTTP response codes to isolate unauthorized network breaches. Before analyzing payload hashes, verify whether IP connections originate from internal subnets or untrusted external proxies.
+          </p>
         </div>
 
-        <!-- SITUATION / OBJECTIVE -->
-        <div style="font-size: 0.85rem; margin-bottom: 15px; color: #aaa;" id="situation-text"></div>
+        <div class="content-card">
+          <h3>🔍 Active Case Study & Interactive Lab</h3>
+          <p id="case-body">
+            <strong>Scenario:</strong> Intercepted database payload contains an encoded credential token. Decode the string below to extract the master admin key and secure the system.
+          </p>
+          <div class="code-block" id="case-payload">Q1lCRVItQURNSU4tMjAyNg==</div>
 
-        <!-- HANDS-ON TERMINAL -->
-        <div class="terminal">
-          <div class="terminal-output" id="term-output">CYBERHUNT Forensic Shell v2.4 initialized.<br>Type your decoded answer below to solve the case study.</div>
-          <div class="terminal-input-row">
-            <span style="color: var(--red); font-family: monospace;">&gt;</span>
-            <input type="text" id="term-input" placeholder="Enter solution hash / answer..." onkeydown="handleTerminalSubmit(event)">
+          <div class="input-row">
+            <input type="text" id="module-answer" placeholder="Enter extracted key (e.g., CYBER-ADMIN-2026)">
+            <button class="btn-primary" onclick="checkModuleAnswer()">Submit Analysis</button>
+            <button class="btn-secondary" onclick="toggleHint()">💡 Request Hint</button>
           </div>
+          <div id="hint-box" class="hint-container hidden">
+            <strong>Analyst Note:</strong> The string uses Base64 encoding. Convert standard 64-character ASCII sets back to readable plaintext.
+          </div>
+          <div id="module-feedback" class="feedback-msg"></div>
+        </div>
+      </section>
+
+      <!-- TAB 2: DIAGNOSTIC QUIZZES -->
+      <section id="tab-quizzes" class="tab-content">
+        <div class="workspace-header">
+          <h2>Knowledge Check: Network Security & Threats</h2>
+          <p class="subtitle">Validate your understanding of cyber defense fundamentals.</p>
+        </div>
+
+        <div class="content-card">
+          <h3 id="quiz-question">Q1: Which port does unencrypted HTTP traffic use by default?</h3>
+          <div class="quiz-options" id="quiz-options">
+            <!-- Dynamically Populated -->
+          </div>
+          <div id="quiz-feedback" class="feedback-msg"></div>
+        </div>
+      </section>
+
+      <!-- TAB 3: ENCODING / DECODING LAB -->
+      <section id="tab-puzzles" class="tab-content">
+        <div class="workspace-header">
+          <h2>Cryptographic & Encoding Workbench</h2>
+          <p class="subtitle">Test cipher transformations, Base64 strings, and hash utilities in real-time.</p>
+        </div>
+
+        <div class="content-card">
+          <h3>Interactive Converter</h3>
+          <textarea id="converter-input" placeholder="Type or paste text here..."></textarea>
+          <div class="button-group">
+            <button class="btn-primary" onclick="convertText('b64-encode')">Base64 Encode</button>
+            <button class="btn-primary" onclick="convertText('b64-decode')">Base64 Decode</button>
+            <button class="btn-secondary" onclick="convertText('hex-encode')">Hex Encode</button>
+            <button class="btn-secondary" onclick="convertText('rot13')">ROT13 Cipher</button>
+          </div>
+          <div class="output-label">OUTPUT RESULT</div>
+          <div class="code-block" id="converter-output">Awaiting input...</div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR: PERSISTENT AI RESEARCH ASSISTANT (JENNI / CHATGPT STYLE) -->
+    <aside class="ai-panel">
+      <div class="ai-header">
+        <div class="ai-title">
+          <span class="ai-dot"></span>
+          CYBERHUNT AI Assistant
+        </div>
+        <span class="ai-status">Online</span>
+      </div>
+
+      <div class="ai-chat-history" id="ai-chat">
+        <div class="ai-msg assistant">
+          Hello Detective. I am your specialized cybersecurity research copilot. Ask me any question about threat vectors, ciphers, code analysis, or security concepts.
         </div>
       </div>
 
-      <!-- BADGES & PROGRESS -->
-      <div class="card">
-        <div class="neon-text" style="margin-bottom: 15px; font-size: 0.9rem;">UNLOCKED BADGES</div>
-        <div class="badge-grid" id="badge-grid"></div>
+      <div class="ai-input-area">
+        <textarea id="ai-user-input" placeholder="Ask AI Assistant anything..." rows="2" onkeydown="handleAiKey(event)"></textarea>
+        <button class="btn-primary" onclick="sendAiMessage()">Send</button>
       </div>
+    </aside>
 
-    </div>
   </div>
 
-  <!-- SLIDE-OUT CLUE & HINT DRAWER -->
-  <div class="clue-drawer" id="clue-drawer">
-    <div class="neon-text" style="font-size: 1rem; margin-bottom: 15px; border-bottom: 1px solid var(--red); padding-bottom: 8px;">INVESTIGATION DOSSIER</div>
-    <div style="font-size: 0.85rem; line-height: 1.6;">
-      <div style="color: var(--cyan); font-family: monospace; margin-bottom: 5px;">INTERCEPTED HINT:</div>
-      <div id="hint-text" style="color: #bbb; background: #000; padding: 10px; border: 1px solid #222; border-radius: 4px;">Select a level to view dossier hints.</div>
-    </div>
-  </div>
-
-  <script>
-    // 15 LEVELS x 3 CASE STUDIES DATA STRUCTURE
-    const levelsData = Array.from({ length: 15 }, (_, lIdx) => ({
-      levelNumber: lIdx + 1,
-      title: `LEVEL ${lIdx + 1}: ${['Digital Footprints', 'Network Intrusions', 'Phishing Vectors', 'Malware Triage', 'Memory Forensics', 'Log Analysis', 'Encryption Breaking', 'Ransomware Tracing', 'Insider Threats', 'Cloud Espionage', 'Mobile Exploits', 'IoT Vulnerabilities', 'Identity Theft', 'Darknet Tracking', 'Incident Response'][lIdx]}`,
-      badgeIcon: ['🔍', '📡', '✉️', '🦠', '🧠', '📜', '🔐', '☣️', '👤', '☁️', '📱', '📟', '🆔', '🌐', '🛡️'][lIdx],
-      cases: [
-        {
-          title: `Case Study ${lIdx + 1}-A: Initial Vector`,
-          preLearning: "Pre-Learning: Cyber investigators analyze metadata and header fields to identify suspicious origins before proceeding to deep payload analysis.",
-          situation: "Situation: Intercepted payload header contains an encoded Base64 string. Decode the string to reveal the attacker's server key.",
-          hint: "Hint: Use standard Base64 decoding logic on the string 'Q1lCRVIyMDI2'.",
-          solution: "CYBER2026"
-        },
-        {
-          title: `Case Study ${lIdx + 1}-B: Anomaly Scan`,
-          preLearning: "Pre-Learning: Port scanning logs reveal unauthorized Reconnaissance activity across internal subnet ranges.",
-          situation: "Situation: Inspect the access log. Identify the suspicious port number associated with unencrypted FTP intrusions.",
-          hint: "Hint: Standard FTP control connections run on Port 21.",
-          solution: "21"
-        },
-        {
-          title: `Case Study ${lIdx + 1}-C: Threat Mitigation`,
-          preLearning: "Pre-Learning: Threat containment requires revoking compromised session tokens immediately upon detection.",
-          situation: "Situation: Input the command to terminate suspicious PID 8942.",
-          hint: "Hint: Type 'kill 8942' to terminate the malicious process.",
-          solution: "kill 8942"
-        }
-      ]
-    }));
-
-    let currentLevel = 0;
-    let currentCase = 0;
-    let unlockedBadges = new Set();
-
-    // VIEW SCREEN SWITCHER
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-
-    // LOGIN SYSTEM
-    function handleLogin(e) {
-      e.preventDefault();
-      const user = document.getElementById('username').value;
-      document.getElementById('user-display').innerText = `AGENT: ${user.toUpperCase()}`;
-      showScreen('dashboard-screen');
-      initDashboard();
-    }
-
-    // DASHBOARD INITIALIZATION
-    function initDashboard() {
-      const levelList = document.getElementById('level-list');
-      levelList.innerHTML = '';
-
-      levelsData.forEach((lvl, idx) => {
-        const item = document.createElement('div');
-        item.className = `level-item ${idx === 0 ? 'active' : ''}`;
-        item.innerText = lvl.title;
-        item.onclick = () => loadLevel(idx);
-        levelList.appendChild(item);
-      });
-
-      initBadges();
-      loadLevel(0);
-    }
-
-    function initBadges() {
-      const grid = document.getElementById('badge-grid');
-      grid.innerHTML = '';
-      levelsData.forEach((lvl, idx) => {
-        const badge = document.createElement('div');
-        badge.id = `badge-${idx}`;
-        badge.className = 'badge-icon';
-        badge.innerText = lvl.badgeIcon;
-        badge.title = lvl.title;
-        grid.appendChild(badge);
-      });
-    }
-
-    // LOAD SELECTED LEVEL AND CASE
-    function loadLevel(idx) {
-      currentLevel = idx;
-      currentCase = 0;
-
-      const items = document.querySelectorAll('.level-item');
-      items.forEach((item, i) => item.classList.toggle('active', i === idx));
-
-      updateCaseView();
-    }
-
-    function selectCase(caseIdx) {
-      currentCase = caseIdx;
-      const tabs = document.querySelectorAll('.tab-btn');
-      tabs.forEach((tab, i) => tab.classList.toggle('active', i === caseIdx));
-      updateCaseView();
-    }
-
-    function updateCaseView() {
-      const caseData = levelsData[currentLevel].cases[currentCase];
-      document.getElementById('case-title').innerText = caseData.title;
-      document.getElementById('pre-learning-text').innerText = caseData.preLearning;
-      document.getElementById('situation-text').innerText = caseData.situation;
-      document.getElementById('hint-text').innerText = caseData.hint;
-      
-      const termOut = document.getElementById('term-output');
-      termOut.innerHTML = `CYBERHUNT Forensic Shell v2.4 initialized.<br>Awaiting input for ${caseData.title}...`;
-    }
-
-    // TERMINAL INPUT HANDLER
-    function handleTerminalSubmit(e) {
-      if (e.key === 'Enter') {
-        const input = document.getElementById('term-input');
-        const val = input.value.trim();
-        const caseData = levelsData[currentLevel].cases[currentCase];
-        const termOut = document.getElementById('term-output');
-
-        if (val.toLowerCase() === caseData.solution.toLowerCase()) {
-          termOut.innerHTML += `<br><span style="color: var(--green);">[SUCCESS] Threat resolved! Passcode matched.</span>`;
-          unlockedBadges.add(currentLevel);
-          document.getElementById(`badge-${currentLevel}`).classList.add('unlocked');
-        } else {
-          termOut.innerHTML += `<br><span style="color: var(--red);">[ERROR] Solution incorrect. Check clues dossier.</span>`;
-        }
-        input.value = '';
-      }
-    }
-
-    // TOGGLE CLUE DRAWER
-    function toggleClues() {
-      document.getElementById('clue-drawer').classList.toggle('open');
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
