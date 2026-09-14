@@ -18,40 +18,40 @@
   <!-- 1. INTRO SCREEN -->
   <div id="screen-intro" class="screen active">
     <div class="intro-card">
-      <div class="intro-title">CyberHunt</div>
+      <div class="intro-title">Cyber<span>Hunt</span></div>
       <div id="typewriter-body" class="typewriter-text"></div>
-      <button class="btn-primary" onclick="initSOC()">Enter SOC Academy</button>
+      <button class="btn-primary" onclick="initSOC()">Initialize SOC Platform</button>
     </div>
   </div>
 
   <!-- HUD HEADER -->
   <div id="hud" class="hud-header" style="display:none;">
     <div class="brand">
-      <span>CyberHunt</span> / SOC Academy
+      <span>CyberHunt</span> / Incident Response Academy
     </div>
     <div class="stats-bar">
-      <div class="stat-item">Score: <span id="score" style="color:var(--accent-blue);">0</span> PTS</div>
-      <div class="stat-item">Badges: <span id="badges-count" style="color:var(--accent-amber);">0/3</span></div>
-      <div class="stat-item">Role: <span style="color:#fff;">Analyst</span></div>
+      <div class="stat-item">Score: <span id="score" style="color:var(--accent-red);">0</span> PTS</div>
+      <div class="stat-item">Badges: <span id="badges-count" style="color:var(--accent-amber);">0/5</span></div>
+      <div class="stat-item">Role: <span style="color:#fff;">SOC Analyst</span></div>
     </div>
   </div>
 
   <!-- 2. DASHBOARD SCREEN -->
   <div id="screen-dashboard" class="screen">
     <div class="dashboard-header-text">
-      <h2>Forensic Training Modules</h2>
-      <p>Select an investigation module to learn forensic techniques, test tools, and complete case assessments.</p>
+      <h2>Active Incident Response Modules</h2>
+      <p>Select a cyber incident case to complete pre-learning lessons, perform terminal decoding, and take quizzes.</p>
     </div>
     <div class="dashboard-grid">
       <!-- Case 1 -->
       <div class="case-card">
         <div>
           <div class="case-header">
-            <div class="case-title">Module 01: Phantom Wire</div>
+            <div class="case-title">Incident #01: Spear Phishing & Recon</div>
             <div class="badge-icon">🕵️‍♂️</div>
           </div>
           <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 20px;">
-            Learn Base64 encoding, ROT13 ciphers, IP log filtering, and Caesar shift logic.
+            Investigate Base64 headers, ROT13 domain ciphers, IP log filtering, and Caesar shift decryption.
           </p>
         </div>
         <div>
@@ -63,11 +63,11 @@
       <div class="case-card">
         <div>
           <div class="case-header">
-            <div class="case-title">Module 02: Dark Payload</div>
+            <div class="case-title">Incident #02: Drone Firmware Hijack</div>
             <div class="badge-icon">🛸</div>
           </div>
           <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 20px;">
-            Examine flight telemetry, process PIDs in memory dumps, and convert Hex data.
+            Examine flight telemetry, inspect RAM dump PIDs, convert Hex coordinates, and override signals.
           </p>
         </div>
         <div>
@@ -79,16 +79,48 @@
       <div class="case-card">
         <div>
           <div class="case-header">
-            <div class="case-title">Module 03: Syndicate Heist</div>
+            <div class="case-title">Incident #03: Insider Vault Exfiltration</div>
             <div class="badge-icon">💎</div>
           </div>
           <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 20px;">
-            Analyze off-hours auth logs, decrypt exfiltrated keys, and identify backdoor ports.
+            Analyze off-hours auth logs, decrypt exfiltrated keys, unpack crypto wallet hashes, and isolate ports.
           </p>
         </div>
         <div>
           <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">5 Lessons | 3 Questions</p>
           <button class="btn-primary" style="width:100%;" onclick="startCase(2)">Start Module</button>
+        </div>
+      </div>
+      <!-- Case 4 -->
+      <div class="case-card">
+        <div>
+          <div class="case-header">
+            <div class="case-title">Incident #04: Ransomware Pre-Execution</div>
+            <div class="badge-icon">☣️</div>
+          </div>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 20px;">
+            Filter double extensions, decode master recovery notes, detect shadow copy deletion, and trigger kill-switches.
+          </p>
+        </div>
+        <div>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">5 Lessons | 3 Questions</p>
+          <button class="btn-primary" style="width:100%;" onclick="startCase(3)">Start Module</button>
+        </div>
+      </div>
+      <!-- Case 5 -->
+      <div class="case-card">
+        <div>
+          <div class="case-header">
+            <div class="case-title">Incident #05: Supply Chain Zero-Day</div>
+            <div class="badge-icon">🛡️</div>
+          </div>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom: 20px;">
+            Verify SBOM library hashes, decode rogue CA certificates, detect DLL side-loading, and isolate build pipelines.
+          </p>
+        </div>
+        <div>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">5 Lessons | 3 Questions</p>
+          <button class="btn-primary" style="width:100%;" onclick="startCase(4)">Start Module</button>
         </div>
       </div>
     </div>
@@ -108,9 +140,9 @@
           <div class="step step-5"></div>
         </div>
         
-        <!-- Interactive Lesson Card -->
+        <!-- Pre-Learning Card -->
         <div class="info-box">
-          <div id="lesson-title" style="color: var(--accent-indigo); font-weight: bold; margin-bottom: 6px; font-size: 0.85rem;"></div>
+          <div id="lesson-title" style="color: var(--accent-red); font-weight: bold; margin-bottom: 6px; font-size: 0.85rem;"></div>
           <div id="lesson-text" style="font-size: 0.82rem; color: #cbd5e1; line-height: 1.5;"></div>
         </div>
 
@@ -130,8 +162,8 @@
       <div class="panel">
         <div class="panel-title">Forensic Console</div>
         <div class="info-box evidence-box" id="evidence-box">
-          <span style="font-size: 0.75rem; color: var(--accent-amber); font-weight: 700; text-transform: uppercase;">Intercepted Evidence</span>
-          <div id="raw-evidence" style="color:#fff; font-weight:600; margin-top: 4px; font-family: var(--font-mono); font-size: 0.9rem;"></div>
+          <span style="font-size: 0.75rem; color: var(--accent-amber); font-weight: 700; text-transform: uppercase;">Intercepted Evidence Payload</span>
+          <div id="raw-evidence" style="color:#fff; font-weight:600; margin-top: 4px; font-family: var(--font-mono); font-size: 0.88rem;"></div>
         </div>
         
         <div class="terminal-output" id="term-out">
@@ -151,10 +183,10 @@
         </div>
       </div>
 
-      <!-- Right Panel: Quiz Questions Platform -->
+      <!-- Right Panel: Quiz Assessment Platform -->
       <div class="panel">
-        <div class="panel-title">Module Assessment</div>
-        <p style="font-size:0.82rem; color:var(--text-muted);">Answer the following questions to demonstrate competency in this module.</p>
+        <div class="panel-title">Case Assessment</div>
+        <p style="font-size:0.82rem; color:var(--text-muted);">Demonstrate understanding of this incident by answering these questions.</p>
         <div id="questions-container" style="display: flex; flex-direction: column; gap: 12px; overflow-y: auto;"></div>
         <button class="btn-secondary" style="margin-top:auto; width:100%;" onclick="exitToDashboard()">Return to Dashboard</button>
       </div>
@@ -164,9 +196,9 @@
   <!-- REWARD MODAL -->
   <div id="modal-badge" class="modal">
     <div class="modal-content">
-      <h2 style="color:#ffffff; margin-bottom:8px;">Module Completed</h2>
+      <h2 style="color:#ffffff; margin-bottom:8px;">Incident Solved!</h2>
       <div id="badge-graphic" style="font-size:3.5rem; margin:16px 0;">🏆</div>
-      <h3 id="badge-name" style="color:var(--accent-blue); margin-bottom:12px; font-size: 1.1rem;">Master Badge</h3>
+      <h3 id="badge-name" style="color:var(--accent-red); margin-bottom:12px; font-size: 1.1rem;">Master Analyst Badge</h3>
       <p id="badge-desc" style="color:var(--text-muted); font-size:0.88rem; margin-bottom:24px; line-height: 1.5;"></p>
       <button class="btn-primary" style="width:100%;" onclick="closeModal()">Claim Badge & Continue</button>
     </div>
