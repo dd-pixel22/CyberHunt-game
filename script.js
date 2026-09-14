@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CYBERHUNT // DIGITAL FORENSICS SOC - GAME ENGINE & SCRIPT
+   CYBERHUNT // FORENSIC ACADEMY & QUIZ PLATFORM - GAME ENGINE
    ========================================================================== */
 
 // --- GLOBAL GAME STATE ---
@@ -8,7 +8,7 @@ let earnedBadges = [];
 let activeCase = 0;
 let activeLevel = 0;
 
-// --- CASE STUDIES & LEVEL DATA ---
+// --- CASES, LESSONS, FORENSICS & QUIZ DATA ---
 const cases = [
   {
     title: "CASE #01: PHANTOM WIRE",
@@ -16,45 +16,55 @@ const cases = [
     badgeIcon: "🕵️‍♂️",
     levels: [
       { 
-        title: "L1: Suspicious Header", 
-        desc: "Inspect raw email payload for encoded Base64 sender.", 
+        title: "L1: Base64 Header Decoding", 
+        lessonTitle: "📖 FORENSIC LESSON: Base64 Encoding",
+        lessonText: "Base64 represents binary data in ASCII text. It always ends with '=' padding. To decode Base64 in your CLI, run the command: <code>decode &lt;Base64String&gt;</code>",
+        desc: "Inspect the raw email payload below and decode the sender's Base64 header.", 
         evidence: "Header: Q3liZXJIdW50LVBocmlzaC1DZXJ0", 
         target: "CyberHunt-Phrish-Cert", 
-        hint: "Use CLI tool: decode <Base64String>" 
+        hint: "Type: decode Q3liZXJIdW50LVBocmlzaC1DZXJ0" 
       },
       { 
-        title: "L2: ROT13 C2 Trace", 
-        desc: "The C2 domain is masked in ROT13.", 
+        title: "L2: ROT13 C2 Tracing", 
+        lessonTitle: "📖 FORENSIC LESSON: ROT13 Substitution Cipher",
+        lessonText: "ROT13 replaces a letter with the 13th letter after it in the alphabet (e.g., A ➔ N). To unmask ROT13 text in your CLI, run: <code>rot13 &lt;Text&gt;</code>",
+        desc: "The Command & Control (C2) server domain is obfuscated in ROT13. Unmask it.", 
         evidence: "Domain: flevag-freire.lqf", 
         target: "srient-server.yds", 
-        hint: "Use CLI tool: rot13 <Text>" 
+        hint: "Type: rot13 flevag-freire.lqf" 
       },
       { 
-        title: "L3: IP Location Search", 
-        desc: "Search raw logs for malicious IP.", 
+        title: "L3: Network IP Analysis", 
+        lessonTitle: "📖 FORENSIC LESSON: IP Log Filtering",
+        lessonText: "Attackers often route traffic through public TOR exit nodes (like 185.x.x.x) rather than local IP blocks (192.168.x.x or 10.x.x.x). To search logs, use: <code>grep &lt;pattern&gt;</code>",
+        desc: "Examine the network log below and submit the malicious external TOR IP address.", 
         evidence: "Log: 192.168.1.1, 10.0.4.12, 185.220.101.5", 
         target: "185.220.101.5", 
-        hint: "Identify the external TOR exit node IP." 
+        hint: "Identify the external public IP address." 
       },
       { 
-        title: "L4: Malware Hash Check", 
-        desc: "Find corrupted file matching target hash MD5 prefix 0xDEAD.", 
+        title: "L4: Malware MD5 Hash Filtering", 
+        lessonTitle: "📖 FORENSIC LESSON: File Signatures & Hashes",
+        lessonText: "File hashes act as unique digital fingerprints. Security teams filter logs by matching hash prefixes (e.g., 0xDEAD) to locate infected executables.",
+        desc: "Identify the corrupted file that matches the target hash prefix 0xDEAD.", 
         evidence: "Files: file1:0xA12, file2:0xDEADBEEF, file3:0xCB9", 
         target: "file2", 
-        hint: "Look for file starting with 0xDEAD." 
+        hint: "Look for the filename associated with 0xDEADBEEF." 
       },
       { 
-        title: "L5: Root Shell Access", 
-        desc: "Crack root passcode string shift (3 characters down).", 
-        evidence: "Pass: EDEF", 
+        title: "L5: Caesar Shift Override", 
+        lessonTitle: "📖 FORENSIC LESSON: Caesar Cipher Shifts",
+        lessonText: "A Caesar Cipher shifts each character by a set number of positions in the alphabet. If a passcode is shifted 3 characters down (+3), shift it backward (-3) to crack it (e.g., E ➔ B, D ➔ A).",
+        desc: "Crack the root passcode string by shifting each letter backward by 3 positions.", 
+        evidence: "Passcode String: EDEF", 
         target: "BABC", 
-        hint: "Shift characters backwards by 3." 
+        hint: "E-3 = B, D-3 = A, E-3 = B, F-3 = C." 
       }
     ],
     questions: [
-      { q: "1. What protocol was compromised in L1?", opts: ["SMTP / Email", "FTP", "DNS"], correct: 0 },
-      { q: "2. What cipher was used on C2 domain?", opts: ["Base64", "ROT13", "AES"], correct: 1 },
-      { q: "3. What type of node was IP 185.220.101.5?", opts: ["Internal Gateway", "TOR Exit Node", "DNS Server"], correct: 1 }
+      { q: "1. What padding character is commonly seen at the end of Base64 strings?", opts: ["=", "#", "$"], correct: 0 },
+      { q: "2. How many alphabet positions does ROT13 shift each character?", opts: ["5", "13", "26"], correct: 1 },
+      { q: "3. What type of IP address is 192.168.1.1?", opts: ["Public TOR Node", "Internal / Private IP", "DNS Root Server"], correct: 1 }
     ]
   },
   {
@@ -63,45 +73,55 @@ const cases = [
     badgeIcon: "🛸",
     levels: [
       { 
-        title: "L1: Drone Telemetry", 
-        desc: "Decode intercepted drone flight Base64 telemetry.", 
+        title: "L1: Telemetry Payload Decoding", 
+        lessonTitle: "📖 FORENSIC LESSON: Flight Telemetry Analysis",
+        lessonText: "Drone telemetry protocols often compress transmission logs using Base64 strings. Decode them using <code>decode &lt;Base64&gt;</code> to retrieve drone identification strings.",
+        desc: "Decode the intercepted drone flight telemetry payload below.", 
         evidence: "Telemetry: RExPTkUtSElJQ0UtMjAyNg==", 
         target: "DRONE-HIJACK-2026", 
-        hint: "Decode the Base64 string." 
+        hint: "Run: decode RExPTkUtSElJQ0UtMjAyNg==" 
       },
       { 
-        title: "L2: Memory Dump Grep", 
-        desc: "Find root process PID in memory dump.", 
+        title: "L2: Memory Process Analysis", 
+        lessonTitle: "📖 FORENSIC LESSON: Memory Forensics & PIDs",
+        lessonText: "Process IDs (PIDs) identify active system tasks. Security tools search memory dumps using <code>grep &lt;keyword&gt;</code> to pinpoint rogue processes.",
+        desc: "Analyze the RAM dump snippet below and enter the PID of the malicious backdoor.", 
         evidence: "PID_LIST: sys=12, net=88, backdoor=9942", 
         target: "9942", 
-        hint: "Find PID associated with backdoor." 
+        hint: "Find the numerical PID paired with 'backdoor'." 
       },
       { 
-        title: "L3: Firmware Cipher", 
-        desc: "Unmask drone firmware passkey using ROT13.", 
-        evidence: "Firmware: qebar-eebg-cnef", 
+        title: "L3: Unmasking Drone Firmware", 
+        lessonTitle: "📖 FORENSIC LESSON: Firmware Obfuscation",
+        lessonText: "Malware creators use lightweight ROT13 ciphers to hide firmware access keys inside system memory. Decode it using <code>rot13 &lt;string&gt;</code>.",
+        desc: "Unmask the encrypted drone firmware root passkey.", 
+        evidence: "Firmware Key: qebar-eebg-cnef", 
         target: "drone-root-pars", 
-        hint: "Apply ROT13 cipher to string." 
+        hint: "Run: rot13 qebar-eebg-cnef" 
       },
       { 
-        title: "L4: GPS Spoofing Coordinates", 
-        desc: "Locate spoofed latitude coordinates in Hex.", 
-        evidence: "Hex: 0x344E (Decimal 13390)", 
+        title: "L4: Hexadecimal Coordinate Conversion", 
+        lessonTitle: "📖 FORENSIC LESSON: Hexadecimal Data Representation",
+        lessonText: "Hexadecimal (Base-16) uses 0-9 and A-F. Forensic logs often display coordinates in Hex (e.g., 0x344E = 13390 in decimal).",
+        desc: "Extract the spoofed latitude decimal coordinate matching Hex 0x344E.", 
+        evidence: "Hex Log: 0x344E (Decimal Value: 13390)", 
         target: "13390", 
-        hint: "Convert Hex 0x344E to decimal or enter directly." 
+        hint: "Enter the decimal value provided in the log: 13390" 
       },
       { 
-        title: "L5: Emergency Override", 
-        desc: "Override drone self-destruct key.", 
-        evidence: "Key: SAFEMODE_ENABLE", 
+        title: "L5: System Override Injection", 
+        lessonTitle: "📖 FORENSIC LESSON: Emergency Protocol Keys",
+        lessonText: "When drones are hijacked, injecting exact hardcoded system override strings halts malicious commands instantly.",
+        desc: "Execute the emergency safety override string to neutralize the drone attack.", 
+        evidence: "Override Token: SAFEMODE_ENABLE", 
         target: "SAFEMODE_ENABLE", 
-        hint: "Type exact key into Target Answer." 
+        hint: "Copy and submit the exact string SAFEMODE_ENABLE." 
       }
     ],
     questions: [
-      { q: "1. What asset was targeted in Case 2?", opts: ["Hospital Grid", "Delivery Drone", "Crypto Vault"], correct: 1 },
-      { q: "2. What PID was malicious?", opts: ["12", "88", "9942"], correct: 2 },
-      { q: "3. How was telemetry recovered?", opts: ["Base64 Decode", "Port Scan", "SQL Injection"], correct: 0 }
+      { q: "1. What is the decimal representation of Hex 0x344E?", opts: ["10000", "13390", "9942"], correct: 1 },
+      { q: "2. Which CLI command filters specific terms in log outputs?", opts: ["grep", "ping", "ssh"], correct: 0 },
+      { q: "3. What does PID stand for in memory analysis?", opts: ["Protocol ID", "Process Identifier", "Private IP Domain"], correct: 1 }
     ]
   },
   {
@@ -110,45 +130,55 @@ const cases = [
     badgeIcon: "💎",
     levels: [
       { 
-        title: "L1: Vault Access Log", 
-        desc: "Find rogue employee ID in midnight login logs.", 
-        evidence: "LOG: 00:00 - USER: EMP_8832_BADGE", 
+        title: "L1: Authentication Log Inspection", 
+        lessonTitle: "📖 FORENSIC LESSON: Insider Threat Detection",
+        lessonText: "Security Operations Centers (SOC) look for unexpected off-hours logins (e.g., midnight access) to identify rogue employee activity.",
+        desc: "Locate the rogue employee ID inside the midnight authentication access log.", 
+        evidence: "LOG: 00:00:12 AM - ACCESS GRANTED: USER: EMP_8832", 
         target: "EMP_8832", 
-        hint: "Extract employee ID format EMP_XXXX." 
+        hint: "Submit the employee badge ID format EMP_8832." 
       },
       { 
-        title: "L2: Decrypt Master Key", 
-        desc: "Decrypt exfiltration payload using ROT13.", 
-        evidence: "Payload: fleqx_iina_xrl", 
+        title: "L2: Exfiltration Payload Decryption", 
+        lessonTitle: "📖 FORENSIC LESSON: Decrypting Exfiltrated Strings",
+        lessonText: "Data thieves obscure exfiltrated strings with ROT13 ciphers to bypass simple DLP (Data Loss Prevention) scanners.",
+        desc: "Decrypt the exfiltrated vault payload string using the ROT13 tool.", 
+        evidence: "Encrypted Payload: fleqx_iina_xrl", 
         target: "cldx_fina_key", 
-        hint: "Run ROT13 on string." 
+        hint: "Run: rot13 fleqx_iina_xrl" 
       },
       { 
-        title: "L3: Crypto Wallet Trace", 
-        desc: "Decode exfiltrated wallet hash Base64.", 
-        evidence: "Hash: MHhGNzg5QUJDRUZFRg==", 
+        title: "L3: Crypto Wallet Address Hash", 
+        lessonTitle: "📖 FORENSIC LESSON: Blockchain Address Encoding",
+        lessonText: "Exfiltrated crypto wallet addresses are typically Base64 encoded before outbound transfer to obscure destination addresses.",
+        desc: "Decode the exfiltrated cryptocurrency wallet hash address.", 
+        evidence: "Wallet Hash: MHhGNzg5QUJDRUZFRg==", 
         target: "0xF789ABCEFEF", 
-        hint: "Decode Base64 string." 
+        hint: "Run: decode MHhGNzg5QUJDRUZFRg==" 
       },
       { 
-        title: "L4: Port Scanner", 
-        desc: "Identify open exfiltration backdoor port.", 
-        evidence: "Ports: 22(Closed), 80(Open), 31337(BACKDOOR)", 
+        title: "L4: Rogue Port Scan Detection", 
+        lessonTitle: "📖 FORENSIC LESSON: Identifying Open Backdoors",
+        lessonText: "Standard ports include 22 (SSH) and 80 (HTTP). High-numbered ports (like 31337) are frequently opened by malware as illicit backdoors.",
+        desc: "Identify the suspicious backdoor network port opened by the attack payload.", 
+        evidence: "Open Ports: 22(Closed), 80(Open), 31337(BACKDOOR)", 
         target: "31337", 
-        hint: "Select the unauthorized high port." 
+        hint: "Submit the unauthorized high-numbered backdoor port." 
       },
       { 
-        title: "L5: Lockdown Command", 
-        desc: "Execute system lockdown protocol.", 
-        evidence: "Command: LOCKDOWN_SYSTEM_NOW", 
+        title: "L5: SOC System Lockdown", 
+        lessonTitle: "📖 FORENSIC LESSON: Incident Containment",
+        lessonText: "Once an insider breach is verified, analysts issue a global system lockdown token to freeze all active session keys.",
+        desc: "Issue the global lockdown system command token.", 
+        evidence: "Lockdown String: LOCKDOWN_SYSTEM_NOW", 
         target: "LOCKDOWN_SYSTEM_NOW", 
-        hint: "Enter lockdown command string." 
+        hint: "Submit: LOCKDOWN_SYSTEM_NOW" 
       }
     ],
     questions: [
-      { q: "1. What was the insider's Employee ID?", opts: ["EMP_8832", "EMP_1001", "EMP_9999"], correct: 0 },
-      { q: "2. Which port hosted the backdoor?", opts: ["22", "80", "31337"], correct: 2 },
-      { q: "3. What type of incident was Case 3?", opts: ["Insider Threat", "Phishing", "DDoS"], correct: 0 }
+      { q: "1. Which port is typically associated with standard HTTP web traffic?", opts: ["80", "22", "31337"], correct: 0 },
+      { q: "2. Why do attackers obscure exfiltrated strings with ciphers?", opts: ["To speed up network bandwidth", "To bypass automated security filters", "To shrink file sizes"], correct: 1 },
+      { q: "3. What is the primary purpose of incident containment?", opts: ["To delete all server logs", "To prevent further unauthorized access or data loss", "To change user background wallpapers"], correct: 1 }
     ]
   }
 ];
@@ -171,7 +201,7 @@ function playBeep(freq = 600, duration = 0.08) {
 }
 
 // --- CINEMATIC INTRO TYPEWRITER EFFECT ---
-const introText = "Year 2026. Global neural networks are falling under silent attack. System breaches, ransomware threats, and encrypted insider leaks threaten critical infrastructure. As a CyberHunt Detective, your job is to inspect raw logs, decode threat payloads, and trace rogue agents before total system blackout...";
+const introText = "WELCOME TO CYBERHUNT ACADEMY // DIGITAL FORENSICS SOC. Master the fundamentals of cryptography, log analysis, and incident response. Learn core cybersecurity concepts, practice live terminal decoding, and solve real-world case quizzes...";
 let introIdx = 0;
 
 function typeIntro() {
@@ -179,7 +209,7 @@ function typeIntro() {
   if (element && introIdx < introText.length) {
     element.innerHTML += introText.charAt(introIdx);
     introIdx++; 
-    setTimeout(typeIntro, 30);
+    setTimeout(typeIntro, 25);
   }
 }
 
@@ -215,7 +245,7 @@ function exitToDashboard() {
   switchScreen('screen-dashboard');
 }
 
-// --- LEVEL MECHANICS ENGINE ---
+// --- LEVEL & LESSON ENGINE ---
 function loadLevel() {
   const caseData = cases[activeCase];
   const levelData = caseData.levels[activeLevel];
@@ -229,6 +259,11 @@ function loadLevel() {
     }
   }
 
+  // Load Lesson & Practice Data
+  document.getElementById('lesson-title').innerText = levelData.lessonTitle;
+  document.getElementById('lesson-text').innerHTML = levelData.lessonText;
+
+  // Load Forensic Challenge Data
   document.getElementById('level-title').innerText = levelData.title;
   document.getElementById('level-desc').innerText = levelData.desc;
   document.getElementById('raw-evidence').innerText = levelData.evidence;
@@ -247,14 +282,14 @@ function submitLevelAnswer() {
     
     if (activeLevel < 4) {
       activeLevel++;
-      alert("LEVEL CLEARED! Advancing forensic investigation...");
+      alert("LEVEL CLEARED! +100 PTS\nAdvancing to next forensic module...");
       loadLevel();
     } else {
       checkCaseCompletion();
     }
   } else {
     playBeep(200, 0.3);
-    alert("ACCESS DENIED: Incorrect forensic answer.");
+    alert("ACCESS DENIED: Answer does not match target output. Review the lesson or use CLI tool.");
   }
 }
 
@@ -267,7 +302,7 @@ function revealHint() {
   hintBox.style.display = 'block';
 }
 
-// --- QUESTIONS ENGINE ---
+// --- QUIZ PLATFORM ENGINE ---
 function loadQuestions() {
   const qContainer = document.getElementById('questions-container');
   qContainer.innerHTML = '';
@@ -283,15 +318,24 @@ function loadQuestions() {
       btn.className = 'quiz-option';
       btn.innerText = opt;
       btn.onclick = () => {
-        playBeep(700);
+        if (btn.disabled) return;
+        
         if (oIdx === qObj.correct) {
-          btn.classList.add('correct');
+          playBeep(1000);
+          btn.style.background = 'rgba(0, 255, 65, 0.2)';
+          btn.style.borderColor = '#00ff41';
+          btn.innerText = "✓ " + opt + " (+50 PTS)";
           currentScore += 50;
           document.getElementById('score').innerText = currentScore;
         } else {
           playBeep(200);
+          btn.style.background = 'rgba(255, 0, 60, 0.2)';
           btn.style.borderColor = 'red';
+          btn.innerText = "✗ " + opt;
         }
+
+        // Disable options in this card after selection
+        qCard.querySelectorAll('.quiz-option').forEach(b => b.disabled = true);
       };
       qCard.appendChild(btn);
     });
@@ -306,7 +350,7 @@ function checkCaseCompletion() {
   }
   document.getElementById('badge-graphic').innerText = cases[activeCase].badgeIcon;
   document.getElementById('badge-name').innerText = cases[activeCase].badge;
-  document.getElementById('badge-desc').innerText = `You successfully completed all 5 forensic levels and solved ${cases[activeCase].title}!`;
+  document.getElementById('badge-desc').innerText = `You mastered all training modules, decoded all 5 forensic levels, and passed the quiz assessment for ${cases[activeCase].title}!`;
   document.getElementById('modal-badge').style.display = 'flex';
 }
 
@@ -338,18 +382,18 @@ function runCommand() {
   let resp = "";
   if (action === 'decode') {
     try { 
-      resp = "DECODED: " + atob(arg); 
+      resp = "DECODED OUTPUT: " + atob(arg); 
     } catch(e) { 
-      resp = "ERROR: Invalid Base64 string."; 
+      resp = "ERROR: Invalid Base64 string formatting."; 
     }
   } else if (action === 'rot13') {
-    resp = "ROT13: " + arg.replace(/[a-zA-Z]/g, c => String.fromCharCode((c <= "Z" ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26));
+    resp = "ROT13 OUTPUT: " + arg.replace(/[a-zA-Z]/g, c => String.fromCharCode((c <= "Z" ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26));
   } else if (action === 'grep') {
-    resp = "GREP MATCH FOUND: " + arg;
+    resp = "GREP SEARCH FOUND: " + arg;
   } else if (action === 'help') {
-    resp = "AVAILABLE TOOLS: decode <base64>, rot13 <text>, grep <pattern>";
+    resp = "CLI TOOLS: decode <base64>, rot13 <text>, grep <pattern>";
   } else {
-    resp = "UNKNOWN COMMAND. Type 'help' for tools.";
+    resp = "UNKNOWN COMMAND. Type 'help' for CLI tool commands.";
   }
 
   const respLine = document.createElement('div');
@@ -370,13 +414,13 @@ function init3D() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   container.appendChild(renderer.domElement);
 
-  // Rotating Wireframe Core
+  // Wireframe Core
   const geo = new THREE.IcosahedronGeometry(4, 1);
   const mat = new THREE.MeshBasicMaterial({ color: 0xff003c, wireframe: true, transparent: true, opacity: 0.35 });
   const core = new THREE.Mesh(geo, mat);
   scene.add(core);
 
-  // Starfield / Particle Nodes
+  // Particles
   const pGeo = new THREE.BufferGeometry();
   const pCount = 300;
   const posArray = new Float32Array(pCount * 3);
