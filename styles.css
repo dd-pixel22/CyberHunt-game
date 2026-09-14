@@ -1,390 +1,351 @@
 /* ==========================================================================
-   CYBERHUNT // CRIMSON ENTERPRISE SOC ACADEMY - STYLESHEET
+   CYBERHUNT // DIGITAL FORENSICS CONSOLE STYLESHEET
+   Aesthetic: Black & Crimson Neon High-VFX Cyberpunk
    ========================================================================== */
 
 :root {
-  --bg-dark: #0d0f12;
-  --bg-card: #161a22;
-  --bg-card-hover: #222734;
-  --accent-red: #e11d48;
-  --accent-red-hover: #be123c;
-  --accent-red-subtle: rgba(225, 29, 72, 0.15);
-  --accent-amber: #f59e0b;
-  --accent-green: #10b981;
-  --border-color: #272d3d;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  --font-mono: "Fira Code", "Cascadia Code", Consolas, Monaco, monospace;
+  --bg: #030306;
+  --panel: #0a0a12;
+  --panel-border: rgba(255, 0, 60, 0.3);
+  --red: #ff003c;
+  --red-glow: rgba(255, 0, 60, 0.6);
+  --cyan: #00f0ff;
+  --text: #d0d0e0;
+  --text-dim: #707085;
+  --green: #00ff66;
 }
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+  user-select: none;
 }
 
 body {
-  background-color: var(--bg-dark);
-  color: var(--text-main);
-  font-family: var(--font-family);
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(255, 0, 60, 0.05) 0%, transparent 70%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 30px 30px, 30px 30px;
 }
 
-#canvas-container {
+/* ==========================================================================
+   TYPOGRAPHY & HIGH-VFX NEON EFFECTS
+   ========================================================================== */
+
+.neon-text {
+  color: var(--red);
+  text-shadow: 0 0 10px var(--red-glow), 0 0 20px var(--red-glow);
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+}
+
+@keyframes pulse {
+  0% { 
+    text-shadow: 0 0 10px var(--red-glow); 
+  }
+  100% { 
+    text-shadow: 0 0 25px var(--red), 0 0 40px var(--red); 
+  }
+}
+
+/* ==========================================================================
+   VIEW SCREENS MANAGER
+   ========================================================================== */
+
+.screen {
+  display: none;
+  min-height: 100vh;
+  width: 100vw;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.18;
-}
-
-/* Screen Layouts */
-.screen {
-  display: none;
-  flex: 1;
-  z-index: 1;
-  padding: 24px;
-  max-width: 1440px;
-  width: 100%;
-  margin: 0 auto;
-  overflow-y: auto;
+  padding: 20px;
 }
 
 .screen.active {
   display: flex;
-  flex-direction: column;
 }
 
-/* Professional Crimson Header */
-.hud-header {
-  background-color: #12161f;
-  border-bottom: 1px solid var(--border-color);
-  padding: 14px 32px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 10;
-}
+/* ==========================================================================
+   1. CINEMATIC INTRO SCREEN
+   ========================================================================== */
 
-.brand {
-  font-size: 1.15rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: var(--text-main);
-}
-
-.brand span {
-  color: var(--accent-red);
-}
-
-.stats-bar {
-  display: flex;
-  gap: 16px;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.stat-item {
-  background: var(--bg-dark);
-  padding: 6px 14px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-}
-
-/* Enterprise Crimson Buttons */
-.btn-primary {
-  background-color: var(--accent-red);
-  color: #ffffff;
-  border: none;
-  padding: 10px 20px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover {
-  background-color: var(--accent-red-hover);
-  transform: translateY(-1px);
-}
-
-.btn-secondary {
-  background-color: transparent;
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-  padding: 8px 16px;
-  font-size: 0.85rem;
-  font-weight: 500;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background-color: var(--bg-card-hover);
-  border-color: var(--accent-red);
-}
-
-/* Intro Screen */
-#screen-intro {
-  align-items: center;
-  justify-content: center;
+#intro-screen {
   text-align: center;
-}
-
-.intro-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  padding: 48px;
-  border-radius: 12px;
-  max-width: 620px;
-  width: 100%;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+  background: radial-gradient(circle, #0f0206 0%, #030306 100%);
 }
 
 .intro-title {
-  font-size: 2.25rem;
-  font-weight: 800;
-  margin-bottom: 12px;
-  color: #ffffff;
+  font-size: 4rem;
+  letter-spacing: 12px;
+  margin-bottom: 10px;
+  animation: pulse 2s infinite alternate;
 }
 
-.intro-title span {
-  color: var(--accent-red);
-}
-
-.typewriter-text {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 32px;
-  min-height: 70px;
-}
-
-/* Dashboard Cards Grid */
-.dashboard-header-text {
-  margin-bottom: 24px;
-}
-
-.dashboard-header-text h2 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
-.dashboard-header-text p {
-  color: var(--text-muted);
+.intro-sub {
+  color: var(--cyan);
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 6px;
   font-size: 0.9rem;
+  margin-bottom: 40px;
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+}
+
+.vfx-btn {
+  background: transparent;
+  color: var(--red);
+  border: 2px solid var(--red);
+  padding: 15px 40px;
+  font-size: 1.1rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  letter-spacing: 3px;
+  cursor: pointer;
+  box-shadow: 0 0 15px var(--panel-border);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.vfx-btn:hover {
+  background: var(--red);
+  color: #fff;
+  box-shadow: 0 0 30px var(--red);
+}
+
+/* ==========================================================================
+   2. LOGIN PORTAL
+   ========================================================================== */
+
+.login-box {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 0 30px rgba(255, 0, 60, 0.15);
+  padding: 40px;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 4px;
+  position: relative;
+}
+
+.input-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+  font-family: monospace;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  background: #05050a;
+  border: 1px solid #222233;
+  color: var(--cyan);
+  font-family: monospace;
+  border-radius: 4px;
+  outline: none;
+}
+
+.input-group input:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 8px var(--panel-border);
+}
+
+/* ==========================================================================
+   3. MAIN DASHBOARD & HEADER BAR
+   ========================================================================== */
+
+#dashboard-screen {
+  justify-content: flex-start;
+  padding-top: 80px;
+}
+
+.header-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(10, 10, 18, 0.9);
+  border-bottom: 1px solid var(--panel-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  z-index: 100;
+  backdrop-filter: blur(5px);
 }
 
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: 280px 1fr 300px;
   gap: 20px;
+  width: 100%;
+  max-width: 1400px;
 }
 
-.case-card {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 22px;
+.card {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 6px;
+  padding: 20px;
+}
+
+/* ==========================================================================
+   LEVEL MAP & CASE VIEWER
+   ========================================================================== */
+
+.level-list {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  transition: all 0.2s ease;
+  gap: 10px;
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
-.case-card:hover {
-  border-color: var(--accent-red);
-  transform: translateY(-2px);
+.level-item {
+  padding: 12px;
+  background: #05050a;
+  border: 1px solid #1a1a2e;
+  border-left: 3px solid #333;
+  cursor: pointer;
+  font-family: monospace;
+  font-size: 0.85rem;
+  transition: all 0.2s;
 }
 
-.case-header {
+.level-item:hover, 
+.level-item.active {
+  border-left-color: var(--red);
+  background: #10050a;
+}
+
+.case-selector {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
-.case-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #ffffff;
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  background: #05050a;
+  border: 1px solid #222;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: monospace;
+}
+
+.tab-btn.active {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  background: #02121a;
+}
+
+.brief-box {
+  background: #020206;
+  border: 1px dashed #222;
+  padding: 15px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* ==========================================================================
+   HANDS-ON TERMINAL & CLUE DRAWER
+   ========================================================================== */
+
+.terminal {
+  background: #000;
+  border: 1px solid #1a1a2e;
+  border-radius: 4px;
+  padding: 15px;
+  font-family: 'Courier New', Courier, monospace;
+  min-height: 180px;
+}
+
+.terminal-output {
+  color: var(--cyan);
+  font-size: 0.85rem;
+  margin-bottom: 10px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.terminal-input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.terminal-input-row input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--red);
+  color: #fff;
+  font-family: monospace;
+  outline: none;
+}
+
+.clue-drawer {
+  position: fixed;
+  right: -350px;
+  top: 60px;
+  bottom: 0;
+  width: 320px;
+  background: #070710;
+  border-left: 2px solid var(--red);
+  padding: 20px;
+  transition: right 0.3s ease;
+  z-index: 90;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.8);
+}
+
+.clue-drawer.open {
+  right: 0;
+}
+
+/* ==========================================================================
+   BADGES SYSTEM
+   ========================================================================== */
+
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .badge-icon {
-  font-size: 1.5rem;
-}
-
-/* Workspace Layout */
-.workspace {
-  display: grid;
-  grid-template-columns: 350px 1fr 350px;
-  gap: 20px;
-  height: 100%;
-}
-
-@media (max-width: 1180px) {
-  .workspace {
-    grid-template-columns: 1fr;
-    overflow-y: auto;
-  }
-}
-
-.panel {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 20px;
+  aspect-ratio: 1;
+  background: #05050a;
+  border: 1px solid #222;
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.panel-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--accent-red);
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-/* Progress Stepper */
-.level-stepper {
-  display: flex;
-  gap: 6px;
-}
-
-.step {
-  flex: 1;
-  height: 5px;
-  background-color: var(--border-color);
-  border-radius: 3px;
-  transition: background-color 0.3s ease;
-}
-
-.step.active {
-  background-color: var(--accent-red);
-}
-
-/* Info & Lesson Boxes */
-.info-box {
-  background-color: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  border-left: 4px solid var(--accent-red);
-  border-radius: 6px;
-  padding: 14px;
-}
-
-.info-box.evidence-box {
-  border-left-color: var(--accent-amber);
-}
-
-/* Terminal Console Component */
-.terminal-output {
-  background-color: #090b0e;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  padding: 14px;
-  font-family: var(--font-mono);
-  font-size: 0.83rem;
-  color: #cbd5e1;
-  height: 190px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.terminal-input-group {
-  display: flex;
-  gap: 8px;
-}
-
-input[type="text"] {
-  flex: 1;
-  background-color: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  color: #ffffff;
-  padding: 10px 14px;
-  border-radius: 6px;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  outline: none;
-  transition: border-color 0.2s ease;
-}
-
-input[type="text"]:focus {
-  border-color: var(--accent-red);
-}
-
-/* Quiz Assessment Styles */
-.quiz-card {
-  background-color: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.quiz-q {
-  font-size: 0.83rem;
-  font-weight: 600;
-  color: #f1f5f9;
-}
-
-.quiz-option {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-muted);
-  padding: 8px 10px;
-  border-radius: 6px;
-  font-size: 0.78rem;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.quiz-option:hover:not(:disabled) {
-  background-color: var(--bg-card-hover);
-  color: #ffffff;
-  border-color: var(--accent-red);
-}
-
-/* Modal Popup */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(13, 15, 18, 0.85);
-  backdrop-filter: blur(5px);
-  z-index: 100;
   align-items: center;
   justify-content: center;
+  font-size: 1.2rem;
+  border-radius: 4px;
+  opacity: 0.3;
 }
 
-.modal-content {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 36px;
-  max-width: 480px;
-  width: 90%;
-  text-align: center;
-  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5);
+.badge-icon.unlocked {
+  opacity: 1;
+  border-color: var(--red);
+  box-shadow: 0 0 10px var(--red-glow);
 }
