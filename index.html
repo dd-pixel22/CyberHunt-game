@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CYBERHUNT // Digital Forensics SOC</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    :root {
+      --bg: #050203;
+      --panel-bg: rgba(15, 3, 6, 0.88);
+      --red: #ff003c;
+      --red-glow: #ff003c;
+      --red-dim: #70001a;
+      --text: #ffffff;
+      --subtext: #ff859c;
+      --amber: #ffaa00;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; user-select: none; }
+    body, html { width: 100%; height: 100%; background: var(--bg); color: var(--text); overflow: hidden; }
+
+    /* WebGL & FX Background */
+    #canvas-container { position: absolute; top:0; left:0; width:100%; height:100%; z-index: 1; }
+    .scanline {
+      position: absolute; top:0; left:0; width:100%; height:100%;
+      background: linear-gradient(rgba(18,0,5,0) 50%, rgba(0,0,0,0.6) 50%), linear-gradient(90deg, rgba(255,0,60,0.03), rgba(0,0,0,0.01));
+      background-size: 100% 4px, 6px 100%; z-index: 2; pointer-events: none;
+    }
+
+    /* Screen Management */
+    .screen { position: absolute; top:0; left:0; width:100%; height:100%; z-index: 10; display: none; flex-direction: column; }
+    .screen.active { display: flex; }
+
+    /* --- 1. CINEMATIC INTRO SCREEN --- */
+    #screen-intro {
+      background: rgba(5,2,3,0.85); justify-content: center; align-items: center; text-align: center; padding: 20px;
+    }
+    .typewriter-title { font-size: 3.5rem; color: var(--red); text-shadow: 0 0 20px var(--red); font-weight: bold; letter-spacing: 5px; margin-bottom: 20px; }
+    .typewriter-text { font-size: 1.2rem; color: var(--subtext); max-width: 700px; line-height: 1.6; min-height: 120px; margin-bottom: 30px; text-shadow: 0 0 8px rgba(255,0,60,0.5); }
+    .neon-btn {
+      background: transparent; border: 2px solid var(--red); color: var(--text); padding: 12px 30px; font-size: 1.1rem;
+      font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 2px;
+      box-shadow: 0 0 15px var(--red-dim); transition: 0.2s all; margin: 10px;
+    }
+    .neon-btn:hover { background: var(--red); color: #000; box-shadow: 0 0 25px var(--red); transform: scale(1.05); }
+
+    /* --- HUD HEADER --- */
+    .hud-header {
+      width: 100%; height: 60px; background: rgba(10,2,4,0.9); border-bottom: 2px solid var(--red);
+      display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 20;
+    }
+    .brand { font-size: 1.5rem; color: var(--red); text-shadow: 0 0 10px var(--red); font-weight: bold; }
+    .stats-bar { display: flex; gap: 20px; color: var(--subtext); }
+
+    /* --- 2. DASHBOARD --- */
+    .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 30px; height: calc(100% - 60px); z-index: 10; }
+    .case-card {
+      background: var(--panel-bg); border: 1px solid var(--red-dim); padding: 20px; border-radius: 4px;
+      display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 0 15px rgba(255,0,60,0.1); transition: 0.3s;
+    }
+    .case-card:hover { border-color: var(--red); box-shadow: 0 0 25px rgba(255,0,60,0.4); transform: translateY(-5px); }
+    .case-title { font-size: 1.3rem; color: var(--red); margin-bottom: 10px; border-bottom: 1px solid var(--red-dim); padding-bottom: 5px; }
+    .badge-icon { font-size: 2.5rem; text-align: center; margin: 15px 0; filter: drop-shadow(0 0 10px var(--red)); }
+
+    /* --- 3. INVESTIGATION WORKSPACE --- */
+    .workspace { display: grid; grid-template-columns: 320px 1fr 380px; gap: 15px; padding: 15px; height: calc(100% - 60px); }
+    .panel { background: var(--panel-bg); border: 1px solid var(--red-dim); padding: 15px; border-radius: 4px; display: flex; flex-direction: column; overflow-y: auto; }
+    .panel-title { color: var(--red); font-size: 1rem; border-bottom: 1px solid var(--red-dim); padding-bottom: 5px; margin-bottom: 10px; text-transform: uppercase; }
+
+    /* Levels Navigation */
+    .level-stepper { display: flex; justify-content: space-between; margin-bottom: 15px; }
+    .step { width: 18%; height: 8px; background: var(--red-dim); border-radius: 2px; }
+    .step.active { background: var(--red); box-shadow: 0 0 10px var(--red); }
+
+    /* Evidence Box & Hands-on Tools */
+    .clue-box { background: rgba(0,0,0,0.6); border: 1px dashed var(--red); padding: 10px; margin-bottom: 10px; font-size: 0.9rem; color: var(--subtext); }
+    .terminal-output { background: #000; border: 1px solid var(--red-dim); height: 180px; padding: 10px; color: #00ff66; font-size: 0.85rem; overflow-y: auto; margin-bottom: 10px; }
+    .terminal-input-group { display: flex; gap: 5px; }
+    .terminal-input-group input { flex:1; background: #000; border: 1px solid var(--red-dim); color: #fff; padding: 8px; font-family: inherit; }
+
+    /* Questions & Quiz */
+    .quiz-card { background: rgba(20, 2, 6, 0.8); border: 1px solid var(--red-dim); padding: 12px; margin-bottom: 10px; }
+    .quiz-q { color: var(--text); font-size: 0.9rem; margin-bottom: 8px; }
+    .quiz-option { display: block; width: 100%; text-align: left; background: rgba(0,0,0,0.5); border: 1px solid var(--red-dim); color: var(--subtext); padding: 6px 10px; margin-bottom: 5px; cursor: pointer; font-size: 0.85rem; }
+    .quiz-option:hover { border-color: var(--red); color: #fff; }
+    .quiz-option.correct { background: rgba(0, 255, 102, 0.2) !important; border-color: #00ff66 !important; color: #00ff66 !important; }
+
+    /* Badge Modal */
+    .modal { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 100; display: none; justify-content: center; align-items: center; }
+    .modal-content { background: var(--panel-bg); border: 2px solid var(--red); padding: 30px; text-align: center; max-width: 500px; box-shadow: 0 0 40px var(--red); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #000; }
+    ::-webkit-scrollbar-thumb { background: var(--red-dim); }
+  </style>
+</head>
+<body>
+
+  <div class="scanline"></div>
+  <div id="canvas-container"></div>
+
+  <!-- 1. CINEMATIC INTRO SCREEN -->
+  <div id="screen-intro" class="screen active">
+    <div class="typewriter-title">CYBERHUNT</div>
+    <div id="typewriter-body" class="typewriter-text"></div>
+    <button class="neon-btn" onclick="initSOC()">[ INITIALIZE SOC SYSTEM ]</button>
+  </div>
+
+  <!-- HUD HEADER -->
+  <div id="hud" class="hud-header" style="display:none;">
+    <div class="brand">CYBERHUNT // FORENSICS</div>
+    <div class="stats-bar">
+      <div>SCORE: <span id="score" style="color:var(--red);">0</span> PTS</div>
+      <div>BADGES: <span id="badges-count" style="color:var(--amber);">0/3</span></div>
+      <div>AGENT: <span style="color:#fff;">CYBER-DETECTIVE</span></div>
+    </div>
+  </div>
+
+  <!-- 2. DASHBOARD SCREEN -->
+  <div id="screen-dashboard" class="screen">
+    <div style="padding: 20px 30px 0 30px;">
+      <h2 style="color:var(--red); text-shadow:0 0 10px var(--red);">ACTIVE CASE FILES</h2>
+      <p style="color:var(--subtext); font-size:0.9rem;">Select an investigation file to begin digital forensic operations.</p>
+    </div>
+    <div class="dashboard-grid">
+      <!-- Case 1 -->
+      <div class="case-card">
+        <div>
+          <div class="case-title">CASE #01: PHANTOM WIRE</div>
+          <p style="font-size:0.85rem; color:var(--subtext);">Rogue Spear-Phishing & OSINT Reconnaissance Investigation.</p>
+          <div class="badge-icon">🕵️‍♂️</div>
+        </div>
+        <div>
+          <p style="font-size:0.8rem; color:#888; margin-bottom:10px;">LEVELS: 5 | QUESTIONS: 3</p>
+          <button class="neon-btn" style="width:100%;" onclick="startCase(0)">OPEN CASE FILE</button>
+        </div>
+      </div>
+      <!-- Case 2 -->
+      <div class="case-card">
+        <div>
+          <div class="case-title">CASE #02: DARK PAYLOAD</div>
+          <p style="font-size:0.85rem; color:var(--subtext);">Drone Flight Controller Zero-Day Payload & Memory Forensics.</p>
+          <div class="badge-icon">🛸</div>
+        </div>
+        <div>
+          <p style="font-size:0.8rem; color:#888; margin-bottom:10px;">LEVELS: 5 | QUESTIONS: 3</p>
+          <button class="neon-btn" style="width:100%;" onclick="startCase(1)">OPEN CASE FILE</button>
+        </div>
+      </div>
+      <!-- Case 3 -->
+      <div class="case-card">
+        <div>
+          <div class="case-title">CASE #03: SYNDICATE HEIST</div>
+          <p style="font-size:0.85rem; color:var(--subtext);">Rogue Insider Exfiltration & Cold Vault Log Analysis.</p>
+          <div class="badge-icon">💎</div>
+        </div>
+        <div>
+          <p style="font-size:0.8rem; color:#888; margin-bottom:10px;">LEVELS: 5 | QUESTIONS: 3</p>
+          <button class="neon-btn" style="width:100%;" onclick="startCase(2)">OPEN CASE FILE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. INVESTIGATION WORKSPACE -->
+  <div id="screen-case" class="screen">
+    <div class="workspace">
+      <!-- Left Panel: Brief & Hints -->
+      <div class="panel">
+        <div class="panel-title" id="case-heading">CASE BRIEFING</div>
+        <div class="level-stepper">
+          <div class="step step-1"></div>
+          <div class="step step-2"></div>
+          <div class="step step-3"></div>
+          <div class="step step-4"></div>
+          <div class="step step-5"></div>
+        </div>
+        <p id="level-title" style="color:var(--text); font-weight:bold; margin-bottom:8px;"></p>
+        <p id="level-desc" style="font-size:0.85rem; color:var(--subtext); line-height:1.4; margin-bottom:15px;"></p>
+        
+        <div class="panel-title" style="margin-top:auto;">PROGRESSIVE HINTS</div>
+        <button class="neon-btn" style="font-size:0.8rem; padding:8px;" onclick="revealHint()">REVEAL HINT (-50 PTS)</button>
+        <div id="hint-display" class="clue-box" style="margin-top:8px; display:none; color:var(--amber);"></div>
+      </div>
+
+      <!-- Center Panel: Hands-on Cyber Terminal & Workspace -->
+      <div class="panel">
+        <div class="panel-title">HANDS-ON FORENSIC CONSOLE</div>
+        <div class="clue-box" id="evidence-box">INTERCEPTED EVIDENCE: <br><span id="raw-evidence" style="color:#fff; font-weight:bold;"></span></div>
+        
+        <div class="terminal-output" id="term-out">
+          <div>[SYSTEM READY] Terminal initialized. Commands available: decode, rot13, grep, help</div>
+        </div>
+        <div class="terminal-input-group">
+          <input type="text" id="term-input" placeholder="Enter CLI command (e.g. decode <text>)" onkeypress="handleTermKey(event)">
+          <button class="neon-btn" style="padding:5px 15px;" onclick="runCommand()">EXEC</button>
+        </div>
+
+        <div style="margin-top: 15px; border-top: 1px solid var(--red-dim); padding-top: 10px;">
+          <p style="font-size: 0.85rem; color: var(--subtext);">Target Objective Answer:</p>
+          <div class="terminal-input-group" style="margin-top:5px;">
+            <input type="text" id="target-input" placeholder="Submit solution to unlock Level...">
+            <button class="neon-btn" style="padding:5px 15px;" onclick="submitLevelAnswer()">SUBMIT</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel: Case Questions -->
+      <div class="panel">
+        <div class="panel-title">CASE INVESTIGATION QUESTIONS</div>
+        <p style="font-size:0.8rem; color:var(--subtext); margin-bottom:10px;">Answer all 3 case questions as you gather clues across the 5 levels.</p>
+        <div id="questions-container"></div>
+        <button class="neon-btn" style="margin-top:auto; width:100%;" onclick="exitToDashboard()">RETURN TO DASHBOARD</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REWARD MODAL -->
+  <div id="modal-badge" class="modal">
+    <div class="modal-content">
+      <h1 style="color:var(--red); margin-bottom:10px;">CASE SOLVED!</h1>
+      <div id="badge-graphic" style="font-size:4rem; margin:15px 0;">🏆</div>
+      <h3 id="badge-name" style="color:#fff; margin-bottom:10px;">MASTER DETECTIVE BADGE</h3>
+      <p id="badge-desc" style="color:var(--subtext); font-size:0.9rem; margin-bottom:20px;"></p>
+      <button class="neon-btn" onclick="closeModal()">CLAIM BADGE & DASHBOARD</button>
+    </div>
+  </div>
+
+  <script>
+    // --- AUDIO SYNTHESIS ---
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep(freq = 600, duration = 0.08) {
+      if(ctx.state === 'suspended') ctx.resume();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine'; osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(); osc.stop(ctx.currentTime + duration);
+    }
+
+    // --- CINEMATIC INTRO TYPEWRITER ---
+    const introText = "Year 2026. Global neural networks are falling under silent attack. System breaches, ransomware threats, and encrypted insider leaks threaten critical infrastructure. As a CyberHunt Detective, your job is to inspect raw logs, decode threat payloads, and trace rogue agents before total system blackout...";
+    let introIdx = 0;
+    function typeIntro() {
+      if(introIdx < introText.length) {
+        document.getElementById('typewriter-body').innerHTML += introText.charAt(introIdx);
+        introIdx++; setTimeout(typeIntro, 30);
+      }
+    }
+    window.onload = () => { init3D(); typeIntro(); };
+
+    // --- GAME DATA STRUCTURE ---
+    let currentScore = 0;
+    let earnedBadges = [];
+    let activeCase = 0;
+    let activeLevel = 0;
+
+    const cases = [
+      {
+        title: "CASE #01: PHANTOM WIRE",
+        badge: "🥇 PHANTOM HUNTER BADGE",
+        badgeIcon: "🕵️‍♂️",
+        levels: [
+          { title: "L1: Suspicious Header", desc: "Inspect raw email payload for encoded Base64 sender.", evidence: "Header: Q3liZXJIdW50LVBocmlzaC1DZXJ0", target: "CyberHunt-Phrish-Cert", hint: "Use CLI tool: decode <Base64String>" },
+          { title: "L2: ROT13 C2 Trace", desc: "The C2 domain is masked in ROT13.", evidence: "Domain: flevag-freire.lqf", target: "srient-server.yds", hint: "Use CLI tool: rot13 <Text>" },
+          { title: "L3: IP Location Search", desc: "Search raw logs for malicious IP.", evidence: "Log: 192.168.1.1, 10.0.4.12, 185.220.101.5", target: "185.220.101.5", hint: "Identify the external TOR exit node IP." },
+          { title: "L4: Malware Hash Check", desc: "Find corrupted file matching target hash MD5 prefix 0xDEAD.", evidence: "Files: file1:0xA12, file2:0xDEADBEEF, file3:0xCB9", target: "file2", hint: "Look for file starting with 0xDEAD." },
+          { title: "L5: Root Shell Access", desc: "Crack root passcode string shift (3 characters down).", evidence: "Pass: EDEF", target: "BABC", hint: "Shift characters backwards by 3." }
+        ],
+        questions: [
+          { q: "1. What protocol was compromised in L1?", opts: ["SMTP / Email", "FTP", "DNS"], correct: 0 },
+          { q: "2. What cipher was used on C2 domain?", opts: ["Base64", "ROT13", "AES"], correct: 1 },
+          { q: "3. What type of node was IP 185.220.101.5?", opts: ["Internal Gateway", "TOR Exit Node", "DNS Server"], correct: 1 }
+        ]
+      },
+      {
+        title: "CASE #02: DARK PAYLOAD",
+        badge: "🛸 SKY FORENSICS BADGE",
+        badgeIcon: "🛸",
+        levels: [
+          { title: "L1: Drone Telemetry", desc: "Decode intercepted drone flight Base64 telemetry.", evidence: "Telemetry: RExPTkUtSElKQUNFLTIwMjY=", target: "DRONE-HIJACK-2026", hint: "Decode the Base64 string." },
+          { title: "L2: Memory Dump Grep", desc: "Find root process PID in memory dump.", evidence: "PID_LIST: sys=12, net=88, backdoor=9942", target: "9942", hint: "Find PID associated with backdoor." },
+          { title: "L3: Firmware Cipher", desc: "Unmask drone firmware passkey using ROT13.", evidence: "Firmware: qebar-eebg-cnef", target: "drone-root-pars", hint: "Apply ROT13 cipher to string." },
+          { title: "L4: GPS Spoofing Coordinates", desc: "Locate spoofed latitude coordinates in Hex.", evidence: "Hex: 0x344E (Decimal 13390)", target: "13390", hint: "Convert Hex 0x344E to decimal or enter directly." },
+          { title: "L5: Emergency Override", desc: "Override drone self-destruct key.", evidence: "Key: SAFEMODE_ENABLE", target: "SAFEMODE_ENABLE", hint: "Type exact key into Target Answer." }
+        ],
+        questions: [
+          { q: "1. What asset was targeted in Case 2?", opts: ["Hospital Grid", "Delivery Drone", "Crypto Vault"], correct: 1 },
+          { q: "2. What PID was malicious?", opts: ["12", "88", "9942"], correct: 2 },
+          { q: "3. How was telemetry recovered?", opts: ["Base64 Decode", "Port Scan", "SQL Injection"], correct: 0 }
+        ]
+      },
+      {
+        title: "CASE #03: SYNDICATE HEIST",
+        badge: "💎 VAULT GUARDIAN BADGE",
+        badgeIcon: "💎",
+        levels: [
+          { title: "L1: Vault Access Log", desc: "Find rogue employee ID in midnight login logs.", evidence: "LOG: 00:00 - USER: EMP_8832_BADGE", target: "EMP_8832", hint: "Extract employee ID format EMP_XXXX." },
+          { title: "L2: Decrypt Master Key", desc: "Decrypt exfiltration payload using ROT13.", evidence: "Payload: fleqx_iina_xrl", target: "cldx_fina_key", hint: "Run ROT13 on string." },
+          { title: "L3: Crypto Wallet Trace", desc: "Decode exfiltrated wallet hash Base64.", evidence: "Hash: MHhGNzg5QUJDRUZFRg==", target: "0xF789ABCEFEF", hint: "Decode Base64 string." },
+          { title: "L4: Port Scanner", desc: "Identify open exfiltration backdoor port.", evidence: "Ports: 22(Closed), 80(Open), 31337(BACKDOOR)", target: "31337", hint: "Select the unauthorized high port." },
+          { title: "L5: Lockdown Command", desc: "Execute system lockdown protocol.", evidence: "Command: LOCKDOWN_SYSTEM_NOW", target: "LOCKDOWN_SYSTEM_NOW", hint: "Enter lockdown command string." }
+        ],
+        questions: [
+          { q: "1. What was the insider's Employee ID?", opts: ["EMP_8832", "EMP_1001", "EMP_9999"], correct: 0 },
+          { q: "2. Which port hosted the backdoor?", opts: ["22", "80", "31337"], correct: 2 },
+          { q: "3. What type of incident was Case 3?", opts: ["Insider Threat", "Phishing", "DDoS"], correct: 0 }
+        ]
+      }
+    ];
+
+    // --- NAVIGATION ---
+    function switchScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function initSOC() {
+      playBeep(800);
+      document.getElementById('hud').style.display = 'flex';
+      switchScreen('screen-dashboard');
+    }
+
+    function startCase(idx) {
+      playBeep(900);
+      activeCase = idx;
+      activeLevel = 0;
+      document.getElementById('case-heading').innerText = cases[activeCase].title;
+      loadLevel();
+      loadQuestions();
+      switchScreen('screen-case');
+    }
+
+    function exitToDashboard() {
+      playBeep(400);
+      switchScreen('screen-dashboard');
+    }
+
+    // --- LEVEL ENGINE ---
+    function loadLevel() {
+      const caseData = cases[activeCase];
+      const levelData = caseData.levels[activeLevel];
+
+      // Update Stepper
+      for(let i=1; i<=5; i++) {
+        const step = document.querySelector(`.step-${i}`);
+        if(i <= activeLevel + 1) step.classList.add('active');
+        else step.classList.remove('active');
+      }
+
+      document.getElementById('level-title').innerText = levelData.title;
+      document.getElementById('level-desc').innerText = levelData.desc;
+      document.getElementById('raw-evidence').innerText = levelData.evidence;
+      document.getElementById('hint-display').style.display = 'none';
+      document.getElementById('target-input').value = '';
+    }
+
+    function submitLevelAnswer() {
+      const input = document.getElementById('target-input').value.trim();
+      const levelData = cases[activeCase].levels[activeLevel];
+
+      if(input.toLowerCase() === levelData.target.toLowerCase()) {
+        playBeep(1200, 0.2);
+        currentScore += 100;
+        document.getElementById('score').innerText = currentScore;
+        
+        if(activeLevel < 4) {
+          activeLevel++;
+          alert("LEVEL CLEARED! Advancing forensic investigation...");
+          loadLevel();
+        } else {
+          checkCaseCompletion();
+        }
+      } else {
+        playBeep(200, 0.3);
+        alert("ACCESS DENIED: Incorrect forensic answer.");
+      }
+    }
+
+    function revealHint() {
+      playBeep(500);
+      currentScore = Math.max(0, currentScore - 50);
+      document.getElementById('score').innerText = currentScore;
+      const hintBox = document.getElementById('hint-display');
+      hintBox.innerText = "HINT: " + cases[activeCase].levels[activeLevel].hint;
+      hintBox.style.display = 'block';
+    }
+
+    // --- QUESTIONS ENGINE ---
+    function loadQuestions() {
+      const qContainer = document.getElementById('questions-container');
+      qContainer.innerHTML = '';
+      const qList = cases[activeCase].questions;
+
+      qList.forEach((qObj, qIdx) => {
+        const qCard = document.createElement('div');
+        qCard.className = 'quiz-card';
+        qCard.innerHTML = `<div class="quiz-q">${qObj.q}</div>`;
+        
+        qObj.opts.forEach((opt, oIdx) => {
+          const btn = document.createElement('button');
+          btn.className = 'quiz-option';
+          btn.innerText = opt;
+          btn.onclick = () => {
+            playBeep(700);
+            if(oIdx === qObj.correct) {
+              btn.classList.add('correct');
+              currentScore += 50;
+              document.getElementById('score').innerText = currentScore;
+            } else {
+              playBeep(200);
+              btn.style.borderColor = 'red';
+            }
+          };
+          qCard.appendChild(btn);
+        });
+        qContainer.appendChild(qCard);
+      });
+    }
+
+    function checkCaseCompletion() {
+      if(!earnedBadges.includes(activeCase)) {
+        earnedBadges.push(activeCase);
+        document.getElementById('badges-count').innerText = `${earnedBadges.length}/3`;
+      }
+      document.getElementById('badge-graphic').innerText = cases[activeCase].badgeIcon;
+      document.getElementById('badge-name').innerText = cases[activeCase].badge;
+      document.getElementById('badge-desc').innerText = `You successfully completed all 5 forensic levels and solved ${cases[activeCase].title}!`;
+      document.getElementById('modal-badge').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('modal-badge').style.display = 'none';
+      switchScreen('screen-dashboard');
+    }
+
+    // --- INTERACTIVE CLI TERMINAL ---
+    function handleTermKey(e) { if(e.key === 'Enter') runCommand(); }
+    
+    function runCommand() {
+      playBeep(900, 0.05);
+      const inputEl = document.getElementById('term-input');
+      const cmd = inputEl.value.trim();
+      const termOut = document.getElementById('term-out');
+      if(!cmd) return;
+
+      const line = document.createElement('div');
+      line.innerHTML = `<span style="color:var(--red);">> ${cmd}</span>`;
+      termOut.appendChild(line);
+
+      const parts = cmd.split(' ');
+      const action = parts[0].toLowerCase();
+      const arg = parts.slice(1).join(' ');
+
+      let resp = "";
+      if(action === 'decode') {
+        try { resp = "DECODED: " + atob(arg); } catch(e) { resp = "ERROR: Invalid Base64 string."; }
+      } else if(action === 'rot13') {
+        resp = "ROT13: " + arg.replace(/[a-zA-Z]/g, c => String.fromCharCode((c <= "Z" ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26));
+      } else if(action === 'grep') {
+        resp = "GREP MATCH FOUND: " + arg;
+      } else if(action === 'help') {
+        resp = "AVAILABLE TOOLS: decode <base64>, rot13 <text>, grep <pattern>";
+      } else {
+        resp = "UNKNOWN COMMAND. Type 'help' for tools.";
+      }
+
+      const respLine = document.createElement('div');
+      respLine.innerText = resp;
+      termOut.appendChild(respLine);
+      termOut.scrollTop = termOut.scrollHeight;
+      inputEl.value = '';
+    }
+
+    // --- THREE.JS BACKGROUND ---
+    function init3D() {
+      const container = document.getElementById('canvas-container');
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      container.appendChild(renderer.domElement);
+
+      // Rotating Wireframe Core
+      const geo = new THREE.IcosahedronGeometry(4, 1);
+      const mat = new THREE.MeshBasicMaterial({ color: 0xff003c, wireframe: true, transparent: true, opacity: 0.35 });
+      const core = new THREE.Mesh(geo, mat);
+      scene.add(core);
+
+      // Starfield / Particle Nodes
+      const pGeo = new THREE.BufferGeometry();
+      const pCount = 300;
+      const posArray = new Float32Array(pCount * 3);
+      for(let i=0; i<pCount*3; i++) posArray[i] = (Math.random() - 0.5) * 30;
+      pGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+      const pMat = new THREE.PointsMaterial({ size: 0.05, color: 0xff003c });
+      const particles = new THREE.Points(pGeo, pMat);
+      scene.add(particles);
+
+      camera.position.z = 8;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        core.rotation.x += 0.003;
+        core.rotation.y += 0.005;
+        particles.rotation.y -= 0.001;
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }
+  </script>
+</body>
+</html>
